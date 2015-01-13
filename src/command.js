@@ -13,6 +13,7 @@ var option = require('./option.js');
 function command(name)
 {
     this.options = [];
+    this.map = {};
 
     this.description = '';
 }
@@ -28,34 +29,6 @@ command.prototype.setDescription = function(str)
     this.description = str;
 
     return this;
-}
-
-/**
- * Normalize arguments.
- *
- + @param   array           args            Arguments to normalize.
- * @return  array                           Normalized arguments.
- */
-command.prototype.normalize = function(args)
-{
-    var ret = [];
-
-    for (var i = 0, cnt = args.length; i < cnt; ++i) {
-        if (args[i] == '--') {
-            ret.concat(args.slice(i));
-            break;
-        }
-
-        if (args[i].length > 1) {
-            if (args[i][0] == '-' && args[i][1] != '-') {
-                args[i].slice(1).split('').forEach(function(chr) {
-                    ret.push('-' + chr);
-                });
-            }
-        }
-    }
-
-    return ret;
 }
 
 /**
@@ -82,6 +55,26 @@ command.prototype.addOption = function(flags, description, options)
 }
 
 /**
+ * Lookup a defined option for a specified flag.
+ *
+ * @param   string          flag            Option flag.
+ * @return  Option|bool                     Returns the option instance or 'false' if no option was found.
+ */
+command.prototype.getOption = function(flag)
+{
+    var ret = false;
+
+    for (var i = 0, cnt = this.options.length; i < cnt; ++i) {
+        if (this.options[i].isFlag(flag)) {
+            ret = this.options[i];
+            break;
+        }
+    }
+
+    return ret;
+}
+
+/**
  * Parse arguments.
  *
  * @param   array           argv            Array of arguments.
@@ -90,8 +83,6 @@ command.prototype.parse = function(argv)
 {
     var arg;
     var args = [];
-
-    argv = this.normalize(argv);
 
     for (var i = 0, cnt = argv.length; i < cnt; ++i) {
         arg = argv[i];
