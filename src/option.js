@@ -24,6 +24,7 @@ function option(flags, description, options)
     this.flags = flags;
     this.description = description || '';
 
+    this.metavar = ('metavar' in options ? options.metavar : null);
     this.required = ('required' in options && options.required);
     this.action = ('action' in options && ['store', 'append', 'count'].indexOf(options.action)
                     ? options.action
@@ -92,6 +93,16 @@ option.prototype.isValid = function(value)
     }
 
     return ret;
+}
+
+/**
+ * Returns true if the option is expected to take a value.
+ *
+ * @return  bool                            Returns true or false.
+ */
+option.prototype.takesValue = function()
+{
+    return (this.metavar !== null);
 }
 
 /**
