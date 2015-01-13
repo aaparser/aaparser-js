@@ -1,0 +1,21 @@
+{
+    "name": "octoarg",
+    "version": "0.0.1",
+    "description": "yet another argument processor for node.js",
+    "keywords": [
+        "command", "cli", "option", "argument", "parser"
+    ],
+    "author": "Harald Lapp <harald@octris.org>",
+    "license": "BSD-3-Clause",
+
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/octophpus/octoarg.git"
+    },
+
+    "engines": {
+        "node": ">= 0.6.x"
+    },
+
+    "main": "src/app.js"
+}
