@@ -36,11 +36,10 @@ command.prototype.setDescription = function(str)
  * following properties:
  *
  * * value -- default value
- * * metavar -- name of argument for the help
  * * action -- ( store [default] | append | count )
  * * required -- ( true | false )
  *
- * @param   array           flags           Mandatory option flags.
+ * @param   string          flags           Mandatory option flags separated by one of ',', '|' or ' '.
  * @param   string          description     Optional description for option.
  * @param   object          options         Optional additional options.
  * @return  Option                          Instance of created option.

@@ -9,11 +9,10 @@
  * Constructor. Options can be an object with the following properties:
  *
  * * value -- default value
- * * metavar -- name of argument for the help
- * * action -- ( store [default] | append | count )
+ * * action -- ( store [default] | switch | append | count )
  * * required -- ( true | false )
  *
- * @param   string          flags           Mandatory option flags.
+ * @param   string          flags           Mandatory option flags separated by one of ',', '|' or ' '.
  * @param   string          description     Optional description for option.
  * @param   object          options         Optional additional options.
  */
@@ -21,10 +20,26 @@ function option(flags, description, options)
 {
     options = options || {};
 
+    this.flags = [];
+    this.metavar = null;
+    
+    var me = this;
+
+    flags.split(/[, |]+/).forEach(function(part) {
+        var match;
+    
+        if (/^-[a-z0-9]$/.test(part) || /^--[a-z][a-z0-9-]+$/.test(part)) {
+            me.flags.push(part);
+        } else if ((match = part.match(/^<([^>]+)>$/))) {
+            me.metavar = match[1];
+        } else {
+            console.log('invalid option format');
+        }
+    });
+
     this.flags = flags;
     this.description = description || '';
 
-    this.metavar = ('metavar' in options ? options.metavar : null);
     this.required = ('required' in options && options.required);
     this.action = ('action' in options && ['store', 'append', 'count'].indexOf(options.action)
                     ? options.action
