@@ -103,6 +103,12 @@ args.prototype.parse = function(argv)
         argv = process.argv.slice(2);
     }
 
+    var me = this;
+
+    this.addOption(['--help']).setAction(function() {
+        me.printHelp();
+    });
+
     command.prototype.parse.call(this, argv.slice(0));
 }
 
