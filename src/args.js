@@ -48,13 +48,17 @@ args.prototype.setVersion = function(str)
 }
 
 /**
- * Parse arguments for command.
+ * Parse arguments for command. Uses 'process.argv' if no parameter is specified.
  *
- * @param   array           _argv           Array of arguments.
+ * @param   array            argv       Optional array of arguments.
  */
-args.prototype.parse = function(_argv)
+args.prototype.parse = function(argv)
 {
-    command.prototype.parse.call(this, _argv.slice(0))
+    if (typeof argv == 'undefined') {
+        argv = process.argv.slice(1);
+    }
+    
+    command.prototype.parse.call(this, argv.slice(0));
 }
 
 // export
