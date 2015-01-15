@@ -7,6 +7,7 @@
 
 var option = require('./option.js');
 var operand = require('./operand.js');
+var events = require('events');
 
 /**
  * Constructor.
@@ -21,6 +22,12 @@ function command(name)
     this.description = '';
     this.action = function() {};
 }
+
+/**
+ * Inherit EventEmitter.
+ */
+command.prototype = Object.create(events.EventEmitter.prototype);
+command.prototype.constructor = command;
 
 /**
  * Setter for the command description.
