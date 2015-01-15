@@ -24,6 +24,17 @@ app.prototype = Object.create(command.prototype);
 app.prototype.constructor = app;
 
 /**
+ * Option settings.
+ */
+app.option = {
+    T_SWITCH      :   1,
+    T_VALUE       :   3,
+    T_LIST        :   7,
+    T_COUNT       :  31,
+    T_REQUIRED    : 256
+}
+
+/**
  * Setter for the application version.
  *
  * @param   string          str         Version string.
@@ -47,4 +58,4 @@ app.prototype.parse = function(_argv)
 }
 
 // export
-module.exports = new app();
+module.exports = app;
