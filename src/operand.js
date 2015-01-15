@@ -57,7 +57,7 @@ operand.prototype.getMetaVar = function()
 operand.prototype.getExpected = function()
 {
     var ret;
-    
+
     if (this.num === '?') {
         ret = [0, 1];
     } else if (this.num === '*') {
@@ -67,7 +67,7 @@ operand.prototype.getExpected = function()
     } else {
         ret = [this.num, this.num];
     }
-    
+
     return ret;
 }
 
@@ -100,3 +100,5 @@ operand.prototype.isValid = function(value)
     return ret;
 }
 
+// export
+module.exports = operand;
