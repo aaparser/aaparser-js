@@ -14,11 +14,12 @@ var id = 0;
  * * action -- ( store [default] | append | count )
  * * required -- ( true | false )
  *
+ * @param   string          name            Name of option.
  * @param   string          flags           Mandatory option flags separated by one of ',', '|' or ' '.
  * @param   string          description     Optional description for option.
  * @param   object          options         Optional additional options.
  */
-function option(flags, description, options)
+function option(name, flags, description, options)
 {
     options = options || {};
 
@@ -149,6 +150,16 @@ option.prototype.isValid = function(value)
 option.prototype.takesValue = function()
 {
     return (this.metavar !== null);
+}
+
+/**
+ * Return value of option.
+ *
+ * @return  mixed                           Value of option.
+ */
+option.prototype.getValue = function()
+{
+    return this.value;
 }
 
 /**

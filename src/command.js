@@ -12,6 +12,7 @@ var option = require('./option.js');
  */
 function command(name)
 {
+    this.commands = {};
     this.options = [];
     this.map = {};
 
@@ -40,6 +41,19 @@ command.prototype.setDescription = function(str)
 command.prototype.setAction = function(fn)
 {
     this.action = fn;
+}
+
+/**
+ * Define a new command.
+ *
+ * @param   string          name            Name of command.
+ * @return  command                         Instance of new command object.
+ */
+command.prototype.addCommand = function(name)
+{
+    this.commands[name] = new command(name);
+
+    return this.commands[name];
 }
 
 /**
@@ -88,13 +102,12 @@ command.prototype.getOption = function(flag)
 /**
  * Parse arguments for command.
  *
- * @param   array           _argv           Array of arguments.
+ * @param   array           argv            Array of arguments.
  */
-command.prototype.parse = function(_argv)
+command.prototype.parse = function(argv)
 {
     var arg, match, option;
 
-    var argv = _argv.slice(0);
     var args = [];
     var options = {};
     var literal = false;
@@ -113,6 +126,8 @@ command.prototype.parse = function(_argv)
 
         if ((match = arg.match(/^(-[a-z0-9])([a-z0-9]*)()$/)) ||
             (match = arg.match(/^(--[a-z][a-z0-9-]*)()(=.*|)$/i))) {
+            // option argument
+
             if (match[3].length > 0) {
                 // push back value
                 argv.unshift(match[3].substring(1));
@@ -123,8 +138,6 @@ command.prototype.parse = function(_argv)
                 console.log('unknown argument "' + match[1] + '"');
                 process.exit(1);
             }
-
-            options[option.getId()] = option;
 
             if (option.takesValue()) {
                 if ((arg = argv.shift())) {
@@ -143,9 +156,16 @@ command.prototype.parse = function(_argv)
                 option.updateValue();
             }
 
+            options[option.getId()] = option;
+
             if (match[2].length > 0) {
                 // push back combined short argument
                 argv.unshift('-' + match[2]);
+            }
+        } else {
+            if (arg in this.commands) {
+                // could be a command
+                this.commands.parse(argv);
             }
         }
     }

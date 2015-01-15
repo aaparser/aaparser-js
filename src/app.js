@@ -14,7 +14,6 @@ function app()
 {
     command.apply(this);
 
-    this.commands = {};
     this.version = null;
 }
 
@@ -38,16 +37,13 @@ app.prototype.setVersion = function(str)
 }
 
 /**
- * Define a new command.
+ * Parse arguments for command.
  *
- * @param   string          name            Name of command.
- * @return  command                         Instance of new command object.
+ * @param   array           _argv           Array of arguments.
  */
-app.prototype.addCommand = function(name)
+app.prototype.parse = function(_argv)
 {
-    this.commands[name] = new command(name);
-
-    return this.commands[name];
+    command.prototype.parse.call(this, _argv.slice(0))
 }
 
 // export
