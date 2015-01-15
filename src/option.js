@@ -6,9 +6,6 @@
  */
 
 var args = require('./args.js');
-var id = 0;
-
-console.log(args);
 
 /**
  * Constructor.
@@ -17,7 +14,6 @@ console.log(args);
  * @param   int             settings        Settings as bit-field.
  * @param   string          metavar         Optional variable name for usage information.
  * @param   mixed           value           Optional default value
- * @return  Option                          Instance of created option.
  */
 function option(flags, settings, metavar, value)
 {
@@ -60,13 +56,13 @@ option.prototype.setHelp = function(description)
 }
 
 /**
- * Return ID of option (which is currently only an incremented number).
+ * Return ID of option (which is currently only a join of the option-flags).
  *
  * @return  int                             Option ID.
  */
 option.prototype.getId = function()
 {
-    return this.id;
+    return this.flags.join('');
 }
 
 /**
