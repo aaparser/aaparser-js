@@ -84,6 +84,7 @@ args.prototype.addCommand = function(name)
         cmd.setAction(function(options, operands) {
             me.printHelp(options, operands);
         });
+        cmd.addOperand(1);
     }
 
     this.commands[name] = new command(name);
