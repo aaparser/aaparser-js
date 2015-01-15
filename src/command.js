@@ -16,6 +16,7 @@ function command(name)
     this.map = {};
 
     this.description = '';
+    this.action = function() {};
 }
 
 /**
@@ -32,14 +33,25 @@ command.prototype.setDescription = function(str)
 }
 
 /**
+ * Set action to call if command appears in arguments.
+ *
+ * @param   callable        fn              Function to call.
+ */
+command.prototype.setAction = function(fn)
+{
+    this.action = fn;
+}
+
+/**
  * Create a new option for command. Options can be an object with the
  * following properties:
  *
  * * value -- default value
+ * * metavar -- name of argument for the help
  * * action -- ( store [default] | append | count )
  * * required -- ( true | false )
  *
- * @param   string          flags           Mandatory option flags separated by one of ',', '|' or ' '.
+ * @param   array           flags           Mandatory option flags.
  * @param   string          description     Optional description for option.
  * @param   object          options         Optional additional options.
  * @return  Option                          Instance of created option.
@@ -74,23 +86,71 @@ command.prototype.getOption = function(flag)
 }
 
 /**
- * Parse arguments.
+ * Parse arguments for command.
  *
- * @param   array           argv            Array of arguments.
+ * @param   array           _argv           Array of arguments.
  */
-command.prototype.parse = function(argv)
+command.prototype.parse = function(_argv)
 {
-    var arg;
-    var args = [];
+    var arg, match, option;
 
-    for (var i = 0, cnt = argv.length; i < cnt; ++i) {
-        arg = argv[i];
+    var argv = _argv.slice(0);
+    var args = [];
+    var options = {};
+    var literal = false;
+
+    while ((arg = argv.shift())) {
+        if (literal) {
+            args.push(arg);
+            continue;
+        }
 
         if (arg == '--') {
-            args = argv.splice(i + 1);
-            break;
+            // only positional arguments following
+            literal = true;
+            continue;
+        }
+
+        if ((match = arg.match(/^(-[a-z0-9])([a-z0-9]*)()$/)) ||
+            (match = arg.match(/^(--[a-z][a-z0-9-]*)()(=.*|)$/i))) {
+            if (match[3].length > 0) {
+                // push back value
+                argv.unshift(match[3].substring(1));
+            }
+
+            if (!(option = this.getOption(match[1]))) {
+                // unknown option
+                console.log('unknown argument "' + match[1] + '"');
+                process.exit(1);
+            }
+
+            options[option.getId()] = option;
+
+            if (option.takesValue()) {
+                if ((arg = argv.shift())) {
+                    // value required
+                    if (!option.isValid(arg)) {
+                        console.log('invalid value for argument "' + match[1] + '"')
+                        process.exit(1);
+                    } else {
+                        option.updateValue(arg);
+                    }
+                } else {
+                    console.log('value missing for argument "' + match[1] + '"');
+                    process.exit(1);
+                }
+            } else {
+                option.updateValue();
+            }
+
+            if (match[2].length > 0) {
+                // push back combined short argument
+                argv.unshift('-' + match[2]);
+            }
         }
     }
+
+    console.log(options);
 }
 
 // export

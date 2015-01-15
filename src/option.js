@@ -5,11 +5,13 @@
  * @author      Harald Lapp <harald@octris.org>
  */
 
+var id = 0;
+
 /**
  * Constructor. Options can be an object with the following properties:
  *
  * * value -- default value
- * * action -- ( store [default] | switch | append | count )
+ * * action -- ( store [default] | append | count )
  * * required -- ( true | false )
  *
  * @param   string          flags           Mandatory option flags separated by one of ',', '|' or ' '.
@@ -22,28 +24,45 @@ function option(flags, description, options)
 
     this.flags = [];
     this.metavar = null;
-    
+    this.id = ++id;
+
     var me = this;
 
-    flags.split(/[, |]+/).forEach(function(part) {
-        var match;
-    
-        if (/^-[a-z0-9]$/.test(part) || /^--[a-z][a-z0-9-]+$/.test(part)) {
-            me.flags.push(part);
-        } else if ((match = part.match(/^<([^>]+)>$/))) {
-            me.metavar = match[1];
-        } else {
-            console.log('invalid option format');
-        }
-    });
+    if (flags !== null) {
+        flags.split(/[, |]+/).forEach(function(part) {
+            var match;
+
+            if (/^-[a-z0-9]$/.test(part) || /^--[a-z][a-z0-9-]+$/.test(part)) {
+                me.flags.push(part);
+            } else if ((match = part.match(/^<([^>]+)>$/))) {
+                me.metavar = match[1];
+            } else {
+                console.log('invalid option format');
+            }
+        });
+    }
 
     this.flags = flags;
     this.description = description || '';
 
     this.required = ('required' in options && options.required);
-    this.action = ('action' in options && ['store', 'append', 'count'].indexOf(options.action)
-                    ? options.action
-                    : 'store');
+
+    if ('action' in options) {
+        if (this.metavar !== null) {
+            // takes a value -- count does not make sense in this case
+            this.action = (['store', 'append'].indexOf(options.action)
+                            ? options.action
+                            : 'store');
+        } else {
+            // does not take a value -- append does not make sense in this case
+            this.action = (options.action == 'count'
+                            ? 'count'
+                            : 'store');
+        }
+    } else {
+        // default action
+        this.action = 'store';
+    }
 
     if ('value' in options) {
         this.setDefaultValue(options.value);
@@ -57,7 +76,19 @@ function option(flags, description, options)
         }
     }
 
+    this.default = this.value;
+
     this.validators = [];
+}
+
+/**
+ * Return ID of option (which is currently only an incremented number).
+ *
+ * @return  int                             Option ID.
+ */
+option.prototype.getId = function()
+{
+    return this.id;
 }
 
 /**
@@ -88,7 +119,7 @@ option.prototype.isRequired = function()
  */
 option.prototype.isFlag = function(flag)
 {
-    return (this.flags.indexOf(flag) >= 0)
+    return (this.flags !== null && this.flags.indexOf(flag) >= 0)
 }
 
 /**
@@ -121,19 +152,34 @@ option.prototype.takesValue = function()
 }
 
 /**
- * Set a value for option according to it's set 'action' option. This should only
+ * Update value of option according to it's set 'action' option. This should only
  * be used to set/update the option value for a parsed option. See 'setDefaultValue'
  * for modifying the default value for an option.
  *
- * @param   mixed           value           Value to set (ignored for 'action').
- * @param   bool            validate        Optionally validate value (default: true).
+ * @param   mixed           value           Optional value to set (ignored for 'action' == 'count').
+ * @param   bool            validate        Optionally validate value (default: true, ignored for 'action' == 'count').
  */
-option.prototype.setValue = function(value, validate)
+option.prototype.updateValue = function(value, validate)
 {
-    validate = (typeof validate == 'undefined' ? true | !!validate);
+    if (this.takesValue()) {
+        // does not take a value
+        if (this.action == 'count') {
+            // counter
+            this.value++;
+        } else {
+            // switch
+            this.value = !this.default;
+        }
+    } else {
+        validate = (typeof validate == 'undefined' ? true : !!validate);
 
-    if (validate && this.isValid(value)) {
-        this.value = value;
+        if (validate && this.isValid(value)) {
+            if (this.action == 'store') {
+                this.value = value;
+            } else {
+                this.value.push(value);
+            }
+        }
     }
 }
 
