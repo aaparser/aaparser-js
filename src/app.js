@@ -10,7 +10,7 @@ var command = require('./command.js');
 /**
  * Constructor.
  */
-function app()
+function args()
 {
     command.apply(this);
 
@@ -20,13 +20,13 @@ function app()
 /**
  * Inherit command.
  */
-app.prototype = Object.create(command.prototype);
-app.prototype.constructor = app;
+args.prototype = Object.create(command.prototype);
+args.prototype.constructor = app;
 
 /**
  * Option settings.
  */
-app.option = {
+args.option = {
     T_SWITCH      :   1,
     T_VALUE       :   3,
     T_LIST        :   7,
@@ -40,7 +40,7 @@ app.option = {
  * @param   string          str         Version string.
  * @return  app                         Returns class instance.
  */
-app.prototype.setVersion = function(str)
+args.prototype.setVersion = function(str)
 {
     this.version = str;
 
@@ -52,10 +52,10 @@ app.prototype.setVersion = function(str)
  *
  * @param   array           _argv           Array of arguments.
  */
-app.prototype.parse = function(_argv)
+args.prototype.parse = function(_argv)
 {
     command.prototype.parse.call(this, _argv.slice(0))
 }
 
 // export
-module.exports = app;
+module.exports = args;
