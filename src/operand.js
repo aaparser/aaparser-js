@@ -40,6 +40,16 @@ operand.prototype.setHelp = function(description)
 }
 
 /**
+ * Return meta variable for operand.
+ *
+ * @return  string                          Meta variable.
+ */
+operand.prototype.getMetaVar = function()
+{
+    return this.metavar;
+}
+
+/**
  * Return min/max number of operands this instance matches.
  *
  * @return  array                           Min, max number of operands.
