@@ -6,6 +6,7 @@
  */
 
 var option = require('./option.js');
+var operand = require('./operand.js');
 
 /**
  * Constructor.
@@ -14,6 +15,7 @@ function command(name)
 {
     this.commands = {};
     this.options = [];
+    this.operands = [];
     this.map = {};
 
     this.description = '';
@@ -75,6 +77,22 @@ command.prototype.addOption = function(flags, settings, metavar, value)
 }
 
 /**
+ * Create a new operand (positional argument).
+ *
+ * @param   int|string      num             Number of arguments.
+ * @param   string          metavar         Optional variable name for usage information.
+ * @param   array           values          Optional default values.
+ */
+command.prototype.addOperand = function(num, metavar, values)
+{
+    var ret = new operand(num, metavar, values);
+    
+    this.operands.push(ret);
+    
+    return ret;
+}
+
+/**
  * Lookup a defined option for a specified flag.
  *
  * @param   string          flag            Option flag.
@@ -95,6 +113,31 @@ command.prototype.getOption = function(flag)
 }
 
 /**
+ * Return min/max expected number of operands
+ */
+command.prototype.getMinMaxOperands = function()
+{
+    var min = 0;
+    var max = 0;
+    
+    this.operands.forEach(function(operand)  {
+        var mm = operand.getExpected();
+        
+        min += m[0];
+        
+        if (max !== Infinity) {
+            if (mm[1] === Infinity) {
+                max = Infinity;
+            } else {
+                max += mm[1];
+            }
+        }
+    });
+    
+    return [min, max];
+}
+
+/**
  * Parse arguments for command.
  *
  * @param   array           argv            Array of arguments.
@@ -105,17 +148,20 @@ command.prototype.parse = function(argv)
 
     var args = [];
     var options = {};
-    var literal = false;
+    var operands = false;
+
+    var mm = this.getMinMaxOperands();
 
     while ((arg = argv.shift())) {
-        if (literal) {
+        if (operands) {
+            // 
             args.push(arg);
             continue;
         }
 
         if (arg == '--') {
-            // only positional arguments following
-            literal = true;
+            // only operands following
+            operands = true;
             continue;
         }
 
@@ -157,15 +203,22 @@ command.prototype.parse = function(argv)
                 // push back combined short argument
                 argv.unshift('-' + match[2]);
             }
+        } else if (args.length < mm[1]) {
+            // expected operand
+            args.push(arg);
         } else {
+            this.action(options, args);
+            
             if (arg in this.commands) {
-                // could be a command
+                // sub command
                 this.commands.parse(argv);
             }
+            
+            return;     // no further arguments should be parsed
         }
     }
 
-    console.log(options);
+    this.action(options, args);
 }
 
 // export
