@@ -39,7 +39,22 @@ args.prototype.setVersion = function(str)
 {
     this.version = str;
 
+    // add implicit --version option
+    var me = this;
+
+    this.addOption(['--version']).setAction(function() {
+        me.printVersion();
+    });
+
     return this;
+}
+
+/**
+ * Print version string.
+ */
+args.prototype.printVersion = function()
+{
+    console.log(this.version);
 }
 
 /**
