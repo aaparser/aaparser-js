@@ -114,6 +114,8 @@ command.prototype.getOption = function(flag)
 
 /**
  * Return min/max expected number of operands
+ *
+ * @return  array                           Min, max expected number of operands.
  */
 command.prototype.getMinMaxOperands = function()
 {
@@ -135,6 +137,82 @@ command.prototype.getMinMaxOperands = function()
     });
     
     return [min, max];
+}
+
+/**
+ * Get remaining minimum number of operands expected.
+ *
+ * @param   int             n               Number of operand to begin with to calculate remaining minimum expected operands.
+ */
+command.prototype.getMinRemaining = function(n)
+{
+    var ret = 0;
+    
+    this.operands.slice(n).forEach(function(operand) {
+        ret += operand.getExpected()[0];
+    });
+    
+    return ret;
+}
+
+/**
+ * Validate operands.
+ *
+ * @param   array           args            Operandal arguments to validate.
+ * @return  object                          Validated arguments.
+ */
+command.prototype.validateOperands = function(args)
+{
+    var metavar, remaining;
+    
+    var operand = null; 
+    var ret = {};
+    var op = 0;
+    var minmax = this.getMinMaxOperands();
+    
+    if (minmax[0] > args.length) {
+        console.log('not enough arguments -- available ' + args.length + ', expected ' + minmax[0]);
+        process.exit(1);
+    } else if (minmax[1] !== Infinity && minmax[1] < args.length) {
+        console.log('too many arguments -- available ' + args.length + ', expected ' + minmax[1]);
+        process.exit(1);
+    }
+
+    do {
+        if (operand === null) {
+            // fetch next operand
+            operand = this.operands[op];
+        
+            minmax = operand.getExpected();
+            metavar = operand.getMetaVar();
+            
+            ++op;
+            
+            remaining = this.getMinRemaining(op);
+
+            if (!(metavar in ret)) {
+                // initialize return value for operand
+                ret[metavar] = [];
+            }
+        }
+        
+        if (minmax[0] > ret[metavar] || (minmax[1] === Infinity && remaining > args.length)) {
+            // expected operand
+            arg = args.shift();
+
+            if (!operand.isValid(arg)) {
+                console.log('invalid value "' + arg + '" for operand');
+                process.exit(1);
+            }
+        
+            ret[metavar].push(arg);
+        } else {
+            // trigger fetching next operand
+            operand = null;
+        }
+    } while(args.length > 0);
+    
+    return ret;
 }
 
 /**
@@ -206,18 +284,22 @@ command.prototype.parse = function(argv)
         } else if (args.length < mm[1]) {
             // expected operand
             args.push(arg);
-        } else {
+        } else if (arg in this.commands) {
+            // sub command
+            args = this.validateOperands(args);
+            
             this.action(options, args);
             
-            if (arg in this.commands) {
-                // sub command
-                this.commands.parse(argv);
-            }
-            
-            return;     // no further arguments should be parsed
+            this.commands[arg].parse(argv);
+        } else {
+            console.log('too many arguments');
+            process.exit(1);
+            break;  // no further arguments should be parsed
         }
     }
 
+    args = this.validateOperands(args);
+            
     this.action(options, args);
 }
 
