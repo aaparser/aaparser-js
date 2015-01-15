@@ -125,7 +125,7 @@ command.prototype.getMinMaxOperands = function()
     this.operands.forEach(function(operand)  {
         var mm = operand.getExpected();
 
-        min += m[0];
+        min += mm[0];
 
         if (max !== Infinity) {
             if (mm[1] === Infinity) {
