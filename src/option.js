@@ -15,6 +15,8 @@
  */
 function option(flags, settings, metavar, value)
 {
+    settings = settings || option.settings.T_SWITCH;
+
     this.flags = flags;
     this.metavar = metavar || 'arg';
 
