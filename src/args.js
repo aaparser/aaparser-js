@@ -65,7 +65,7 @@ args.prototype.addCommand = function(name)
     if (name != 'help' && !('help' in this.commands)) {
         // add implicit help command as soon as the first command get's added
         var me = this;
-        var cmd = command.prototype.parse.call(this, 'help');
+        var cmd = command.prototype.addCommand.call(this, 'help');
         cmd.setAction(function(options, operands) {
             me.printHelp(options, operands);
         });
