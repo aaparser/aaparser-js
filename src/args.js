@@ -43,6 +43,40 @@ args.prototype.setVersion = function(str)
 }
 
 /**
+ * Print help.
+ *
+ * @param   object          options         Parsed options.
+ * @param   object          operands        Parsed operands.
+ */
+args.prototype.printHelp = function(options, operands)
+{
+    console.log('HELP', options, operands);
+    process.exit(1);
+}
+
+/**
+ * Define a new command.
+ *
+ * @param   string          name            Name of command.
+ * @return  command                         Instance of new command object.
+ */
+args.prototype.addCommand = function(name)
+{
+    if (name != 'help' && !('help' in this.commands)) {
+        // add implicit help command as soon as the first command get's added
+        var me = this;
+        var cmd = command.prototype.parse.call(this, 'help');
+        cmd.setAction(function(options, operands) {
+            me.printHelp(options, operands);
+        });
+    }
+
+    this.commands[name] = new command(name);
+
+    return this.commands[name];
+}
+
+/**
  * Parse arguments for command. Uses 'process.argv' if no parameter is specified.
  *
  * @param   array            argv       Optional array of arguments.
