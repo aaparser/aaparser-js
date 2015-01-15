@@ -178,7 +178,7 @@ command.prototype.validateOperands = function(args)
         process.exit(1);
     }
 
-    do {
+    while (args.length > 0) {
         if (operand === null) {
             // fetch next operand
             operand = this.operands[op];
@@ -210,7 +210,7 @@ command.prototype.validateOperands = function(args)
             // trigger fetching next operand
             operand = null;
         }
-    } while(args.length > 0);
+    }
 
     return ret;
 }
@@ -292,7 +292,7 @@ command.prototype.parse = function(argv)
 
             this.commands[arg].parse(argv);
         } else {
-            console.log('too many arguments');
+            console.log('too many arguments for "' + arg + '"');
             process.exit(1);
             break;  // no further arguments should be parsed
         }

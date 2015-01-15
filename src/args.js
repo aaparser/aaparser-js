@@ -50,7 +50,7 @@ args.prototype.setVersion = function(str)
 args.prototype.parse = function(argv)
 {
     if (typeof argv == 'undefined') {
-        argv = process.argv.slice(1);
+        argv = process.argv.slice(2);
     }
 
     command.prototype.parse.call(this, argv.slice(0));
