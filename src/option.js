@@ -41,6 +41,8 @@ function option(flags, settings, metavar, value)
     this.default = this.value;
 
     this.validators = [];
+
+    this.action = function() {};
 }
 
 /**
@@ -53,6 +55,16 @@ option.settings = {
     T_COUNT       :  31,
     T_REQUIRED    : 256
 };
+
+/**
+ * Set action to call if option appears in arguments.
+ *
+ * @param   callable        fn              Function to call.
+ */
+option.prototype.setAction = function(fn)
+{
+    this.action = fn;
+}
 
 /**
  * Set help description.

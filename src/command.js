@@ -275,6 +275,7 @@ command.prototype.parse = function(argv)
                 option.updateValue();
             }
 
+            option.action(option.value);
             options[option.getId()] = option;
 
             if (match[2].length > 0) {
