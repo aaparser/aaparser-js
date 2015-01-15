@@ -17,5 +17,5 @@
         "node": ">= 0.6.x"
     },
 
-    "main": "src/app.js"
+    "main": "src/args.js"
 }
