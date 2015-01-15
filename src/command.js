@@ -57,22 +57,17 @@ command.prototype.addCommand = function(name)
 }
 
 /**
- * Create a new option for command. Options can be an object with the
- * following properties:
+ * Create a new option for command.
  *
- * * value -- default value
- * * metavar -- name of argument for the help
- * * action -- ( store [default] | append | count )
- * * required -- ( true | false )
- *
- * @param   array           flags           Mandatory option flags.
- * @param   string          description     Optional description for option.
- * @param   object          options         Optional additional options.
+ * @param   array           flags           Option flags.
+ * @param   int             settings        Settings as bit-field.
+ * @param   string          metavar         Optional variable name for usage information.
+ * @param   mixed           value           Optional default value
  * @return  Option                          Instance of created option.
  */
-command.prototype.addOption = function(flags, description, options)
+command.prototype.addOption = function(flags, settings, metavar, value)
 {
-    var ret = new option(flags, description, options);
+    var ret = new option(flags, settings, metavar, value);
 
     this.options.push(ret);
 

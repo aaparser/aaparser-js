@@ -5,72 +5,39 @@
  * @author      Harald Lapp <harald@octris.org>
  */
 
+var args = require('./args.js');
 var id = 0;
 
-/**
- * Constructor. Options can be an object with the following properties:
- *
- * * value -- default value
- * * action -- ( store [default] | append | count )
- * * required -- ( true | false )
- *
- * @param   string          name            Name of option.
- * @param   string          flags           Mandatory option flags separated by one of ',', '|' or ' '.
- * @param   string          description     Optional description for option.
- * @param   object          options         Optional additional options.
- */
-function option(name, flags, description, options)
-{
-    options = options || {};
+console.log(args);
 
-    this.flags = [];
-    this.metavar = null;
+/**
+ * Constructor.
+ *
+ * @param   array           flags           Option flags.
+ * @param   int             settings        Settings as bit-field.
+ * @param   string          metavar         Optional variable name for usage information.
+ * @param   mixed           value           Optional default value
+ * @return  Option                          Instance of created option.
+ */
+function option(flags, settings, metavar, value)
+{
+    this.flags = flags;
+    this.metavar = metavar || 'arg';
     this.id = ++id;
 
-    var me = this;
+    this.type = settings & 0xff;
+    this.required = ((settings & args.option.T_REQUIRED) == args.option.T_REQUIRED);
+    this.default = value;
 
-    if (flags !== null) {
-        flags.split(/[, |]+/).forEach(function(part) {
-            var match;
+    this.description = '';
 
-            if (/^-[a-z0-9]$/.test(part) || /^--[a-z][a-z0-9-]+$/.test(part)) {
-                me.flags.push(part);
-            } else if ((match = part.match(/^<([^>]+)>$/))) {
-                me.metavar = match[1];
-            } else {
-                console.log('invalid option format');
-            }
-        });
-    }
 
-    this.flags = flags;
-    this.description = description || '';
-
-    this.required = ('required' in options && options.required);
-
-    if ('action' in options) {
-        if (this.metavar !== null) {
-            // takes a value -- count does not make sense in this case
-            this.action = (['store', 'append'].indexOf(options.action)
-                            ? options.action
-                            : 'store');
-        } else {
-            // does not take a value -- append does not make sense in this case
-            this.action = (options.action == 'count'
-                            ? 'count'
-                            : 'store');
-        }
-    } else {
-        // default action
-        this.action = 'store';
-    }
-
-    if ('value' in options) {
+    if (typeof value !== 'undefined') {
         this.setDefaultValue(options.value);
     } else {
-        if (this.action == 'count') {
+        if (this.type == args.option.T_COUNT) {
             this.value = 0;
-        } else if (this.action == 'append') {
+        } else if (this.type == args.option.T_LIST) {
             this.value = [];
         } else {
             this.value = true;
@@ -80,6 +47,16 @@ function option(name, flags, description, options)
     this.default = this.value;
 
     this.validators = [];
+}
+
+/**
+ * Set help description.
+ *
+ * @param   string          description     Help description for option.
+ */
+option.prototype.setHelp = function(description)
+{
+    this.description = description;
 }
 
 /**
@@ -149,7 +126,8 @@ option.prototype.isValid = function(value)
  */
 option.prototype.takesValue = function()
 {
-    return (this.metavar !== null);
+    return (this.type == args.option.T_VALUE ||
+            this.type == args.option.T_LIST);
 }
 
 /**
@@ -172,9 +150,9 @@ option.prototype.getValue = function()
  */
 option.prototype.updateValue = function(value, validate)
 {
-    if (this.takesValue()) {
+    if (!this.takesValue()) {
         // does not take a value
-        if (this.action == 'count') {
+        if (this.type == args.option.T_COUNT) {
             // counter
             this.value++;
         } else {
@@ -185,7 +163,7 @@ option.prototype.updateValue = function(value, validate)
         validate = (typeof validate == 'undefined' ? true : !!validate);
 
         if (validate && this.isValid(value)) {
-            if (this.action == 'store') {
+            if (this.type == args.option.T_VALUE) {
                 this.value = value;
             } else {
                 this.value.push(value);
@@ -202,9 +180,9 @@ option.prototype.updateValue = function(value, validate)
  */
 option.prototype.setDefaultValue = function(value)
 {
-    if (this.action == 'count') {
+    if (this.type == args.option.T_COUNT) {
         this.value = (!isNaN(value) ? value : 0);
-    } else if (this.action == 'append') {
+    } else if (this.type == args.option.T_LIST) {
         this.value = (Object.prototype.toString.call(value) === '[object Array]' ? value : []);
     } else {
         this.value = (/boolean|number|string/.test(value) ? value : true);

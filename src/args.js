@@ -21,7 +21,7 @@ function args()
  * Inherit command.
  */
 args.prototype = Object.create(command.prototype);
-args.prototype.constructor = app;
+args.prototype.constructor = args;
 
 /**
  * Option settings.
