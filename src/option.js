@@ -5,8 +5,6 @@
  * @author      Harald Lapp <harald@octris.org>
  */
 
-var args = require('./args.js');
-
 /**
  * Constructor.
  *
@@ -19,21 +17,19 @@ function option(flags, settings, metavar, value)
 {
     this.flags = flags;
     this.metavar = metavar || 'arg';
-    this.id = ++id;
 
     this.type = settings & 0xff;
-    this.required = ((settings & args.option.T_REQUIRED) == args.option.T_REQUIRED);
+    this.required = ((settings & option.settings.T_REQUIRED) == option.settings.T_REQUIRED);
     this.default = value;
 
     this.description = '';
 
-
     if (typeof value !== 'undefined') {
         this.setDefaultValue(options.value);
     } else {
-        if (this.type == args.option.T_COUNT) {
+        if (this.type == option.settings.T_COUNT) {
             this.value = 0;
-        } else if (this.type == args.option.T_LIST) {
+        } else if (this.type == option.settings.T_LIST) {
             this.value = [];
         } else {
             this.value = true;
@@ -44,6 +40,17 @@ function option(flags, settings, metavar, value)
 
     this.validators = [];
 }
+
+/**
+ * Option settings.
+ */
+option.settings = {
+    T_SWITCH      :   1,
+    T_VALUE       :   3,
+    T_LIST        :   7,
+    T_COUNT       :  31,
+    T_REQUIRED    : 256
+};
 
 /**
  * Set help description.
@@ -122,8 +129,8 @@ option.prototype.isValid = function(value)
  */
 option.prototype.takesValue = function()
 {
-    return (this.type == args.option.T_VALUE ||
-            this.type == args.option.T_LIST);
+    return (this.type == option.settings.T_VALUE ||
+            this.type == option.settings.T_LIST);
 }
 
 /**
@@ -148,7 +155,7 @@ option.prototype.updateValue = function(value, validate)
 {
     if (!this.takesValue()) {
         // does not take a value
-        if (this.type == args.option.T_COUNT) {
+        if (this.type == option.settings.T_COUNT) {
             // counter
             this.value++;
         } else {
@@ -159,7 +166,7 @@ option.prototype.updateValue = function(value, validate)
         validate = (typeof validate == 'undefined' ? true : !!validate);
 
         if (validate && this.isValid(value)) {
-            if (this.type == args.option.T_VALUE) {
+            if (this.type == option.settings.T_VALUE) {
                 this.value = value;
             } else {
                 this.value.push(value);
@@ -176,9 +183,9 @@ option.prototype.updateValue = function(value, validate)
  */
 option.prototype.setDefaultValue = function(value)
 {
-    if (this.type == args.option.T_COUNT) {
+    if (this.type == option.settings.T_COUNT) {
         this.value = (!isNaN(value) ? value : 0);
-    } else if (this.type == args.option.T_LIST) {
+    } else if (this.type == option.settings.T_LIST) {
         this.value = (Object.prototype.toString.call(value) === '[object Array]' ? value : []);
     } else {
         this.value = (/boolean|number|string/.test(value) ? value : true);

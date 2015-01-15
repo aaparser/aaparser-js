@@ -86,9 +86,9 @@ command.prototype.addOption = function(flags, settings, metavar, value)
 command.prototype.addOperand = function(num, metavar, values)
 {
     var ret = new operand(num, metavar, values);
-    
+
     this.operands.push(ret);
-    
+
     return ret;
 }
 
@@ -121,12 +121,12 @@ command.prototype.getMinMaxOperands = function()
 {
     var min = 0;
     var max = 0;
-    
+
     this.operands.forEach(function(operand)  {
         var mm = operand.getExpected();
-        
+
         min += m[0];
-        
+
         if (max !== Infinity) {
             if (mm[1] === Infinity) {
                 max = Infinity;
@@ -135,7 +135,7 @@ command.prototype.getMinMaxOperands = function()
             }
         }
     });
-    
+
     return [min, max];
 }
 
@@ -147,11 +147,11 @@ command.prototype.getMinMaxOperands = function()
 command.prototype.getMinRemaining = function(n)
 {
     var ret = 0;
-    
+
     this.operands.slice(n).forEach(function(operand) {
         ret += operand.getExpected()[0];
     });
-    
+
     return ret;
 }
 
@@ -164,12 +164,12 @@ command.prototype.getMinRemaining = function(n)
 command.prototype.validateOperands = function(args)
 {
     var metavar, remaining;
-    
-    var operand = null; 
+
+    var operand = null;
     var ret = {};
     var op = 0;
     var minmax = this.getMinMaxOperands();
-    
+
     if (minmax[0] > args.length) {
         console.log('not enough arguments -- available ' + args.length + ', expected ' + minmax[0]);
         process.exit(1);
@@ -182,12 +182,12 @@ command.prototype.validateOperands = function(args)
         if (operand === null) {
             // fetch next operand
             operand = this.operands[op];
-        
+
             minmax = operand.getExpected();
             metavar = operand.getMetaVar();
-            
+
             ++op;
-            
+
             remaining = this.getMinRemaining(op);
 
             if (!(metavar in ret)) {
@@ -195,7 +195,7 @@ command.prototype.validateOperands = function(args)
                 ret[metavar] = [];
             }
         }
-        
+
         if (minmax[0] > ret[metavar] || (minmax[1] === Infinity && remaining > args.length)) {
             // expected operand
             arg = args.shift();
@@ -204,14 +204,14 @@ command.prototype.validateOperands = function(args)
                 console.log('invalid value "' + arg + '" for operand');
                 process.exit(1);
             }
-        
+
             ret[metavar].push(arg);
         } else {
             // trigger fetching next operand
             operand = null;
         }
     } while(args.length > 0);
-    
+
     return ret;
 }
 
@@ -232,7 +232,7 @@ command.prototype.parse = function(argv)
 
     while ((arg = argv.shift())) {
         if (operands) {
-            // 
+            //
             args.push(arg);
             continue;
         }
@@ -287,9 +287,9 @@ command.prototype.parse = function(argv)
         } else if (arg in this.commands) {
             // sub command
             args = this.validateOperands(args);
-            
+
             this.action(options, args);
-            
+
             this.commands[arg].parse(argv);
         } else {
             console.log('too many arguments');
@@ -299,7 +299,7 @@ command.prototype.parse = function(argv)
     }
 
     args = this.validateOperands(args);
-            
+
     this.action(options, args);
 }
 

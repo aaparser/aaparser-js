@@ -6,6 +6,7 @@
  */
 
 var command = require('./command.js');
+var option = require('./option.js');
 
 /**
  * Constructor.
@@ -26,13 +27,7 @@ args.prototype.constructor = args;
 /**
  * Option settings.
  */
-args.option = {
-    T_SWITCH      :   1,
-    T_VALUE       :   3,
-    T_LIST        :   7,
-    T_COUNT       :  31,
-    T_REQUIRED    : 256
-}
+args.option = option.settings;
 
 /**
  * Setter for the application version.
@@ -57,7 +52,7 @@ args.prototype.parse = function(argv)
     if (typeof argv == 'undefined') {
         argv = process.argv.slice(1);
     }
-    
+
     command.prototype.parse.call(this, argv.slice(0));
 }
 
