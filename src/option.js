@@ -27,7 +27,7 @@ function option(flags, settings, metavar, value)
     this.description = '';
 
     if (typeof value !== 'undefined') {
-        this.setDefaultValue(options.value);
+        this.setDefaultValue(value);
     } else {
         if (this.type == option.settings.T_COUNT) {
             this.value = 0;
