@@ -249,20 +249,28 @@ command.prototype.parse = function(argv)
 
     var args = [];
     var options = {};
-    var operands = false;
+    var operands = {};
+    var literal = false;
+
+    this.options.forEach(function(option) {
+        var data = option.getData();
+
+        if (data !== null) {
+            options[option.getName()] = data;
+        }
+    });
 
     var mm = this.getMinMaxOperands();
 
     while ((arg = argv.shift())) {
-        if (operands) {
-            //
+        if (literal) {
             args.push(arg);
             continue;
         }
 
         if (arg == '--') {
             // only operands following
-            operands = true;
+            literal = true;
             continue;
         }
 
@@ -310,9 +318,9 @@ command.prototype.parse = function(argv)
             args.push(arg);
         } else if (arg in this.commands) {
             // sub command
-            args = this.processOperands(args);
+            operands = this.processOperands(args);
 
-            this.settings.action(options, args);
+            this.settings.action(options, operands);
 
             this.commands[arg].parse(argv);
         } else {
@@ -322,9 +330,9 @@ command.prototype.parse = function(argv)
         }
     }
 
-    args = this.processOperands(args);
+    operands = this.processOperands(args);
 
-    this.settings.action(options, args);
+    this.settings.action(options, operands);
 }
 
 // export
