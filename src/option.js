@@ -7,15 +7,6 @@
 
 var extend = require('util')._extend;
 
-var option_types = {
-    bool:   'bool',
-    value:  'value',
-    count:  'count',
-    list:   'list'
-}
-
-var option_vtypes = [option_types.value, option_types.list];
-
 /**
  * Constructor.
  *
@@ -26,15 +17,15 @@ var option_vtypes = [option_types.value, option_types.list];
  */
 function option(name, type, flags, settings)
 {
-    if (!(type in option_types)) {
+    if (['bool', 'count', 'list', 'value'].indexOf(type) < 0) {
         throw 'invalid option type "' + type + '"';
     }
 
     settings = extend(
         {
             'variable': name,
-            'default':  (type == option.type.bool ? false : null),
-            'store':    (type == option.type.bool ? true : null),
+            'default':  (type == 'bool' ? false : null),
+            'store':    (type == 'bool' ? true : null),
             'help':     '',
             'required': false,
             'action':   function() {}
@@ -50,20 +41,20 @@ function option(name, type, flags, settings)
     this.settings = settings;
 
     switch (this.type) {
-        case option.type.bool:
+        case 'bool':
             this.data = !!settings.default;
             break;
-        case option.type.count:
+        case 'count':
             this.data = (parseFloat(settings.default) == parseInt(settings.default) && !isNaN(settings.default)
                             ? settings.default
                             : 0);
             break;
-        case option.type.list:
+        case 'list':
             this.data = (Object.prototype.toString.call(settings.default) === '[object Array]'
                             ? settings.default
                             : []);
             break;
-        case option.type.value:
+        case 'value':
             this.data = (/boolean|number|string/.test(settings.default)
                             ? '' + settings.default
                             : null);
@@ -72,11 +63,6 @@ function option(name, type, flags, settings)
 
     this.validators = [];
 }
-
-/**
- * Option types.
- */
-option.type = option_types;
 
 /**
  * Set help text.
@@ -165,7 +151,7 @@ option.prototype.isValid = function(value)
  */
 option.prototype.takesValue = function()
 {
-    return (option_vtypes.indexOf(this.type) >= 0);
+    return (['list', 'value'].indexOf(this.type) >= 0);
 }
 
 /**
@@ -175,7 +161,7 @@ option.prototype.takesValue = function()
  */
 option.prototype.getData = function()
 {
-    return (this.type == option.type.list
+    return (this.type == 'list'
             ? this.data.slice(0)
             : this.data);
 }
@@ -189,16 +175,16 @@ option.prototype.getData = function()
 option.prototype.update = function(value)
 {
     switch (this.type) {
-        case option.type.bool:
+        case 'bool':
             this.data = !!this.settings.store;
             break;
-        case option.type.count:
+        case 'count':
             this.data++;
             break;
-        case option.type.list:
+        case 'list':
             this.data.push(value);
             break;
-        case option.type.value:
+        case 'value':
             this.data = value;
             break;
     }

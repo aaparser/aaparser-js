@@ -7,7 +7,6 @@
 
 var command = require('./command.js');
 
-var option = require('./option.js');
 /**
  * Constructor.
  */
@@ -23,11 +22,6 @@ function args()
  */
 args.prototype = Object.create(command.prototype);
 args.prototype.constructor = args;
-
-/**
- * Option types.
- */
-args.option = option.type;
 
 /**
  * Setter for the application version.
