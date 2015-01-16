@@ -21,7 +21,6 @@ function operand(name, num, settings)
             'variable': name,
             'default':  [],
             'help':     '',
-            'required': false,
             'action':   function() {}
         },
         settings
