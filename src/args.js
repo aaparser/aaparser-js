@@ -37,6 +37,40 @@ args.prototype.setVersion = function(str)
 }
 
 /**
+ * Print help.
+ */
+args.prototype.printHelp = function()
+{
+}
+
+/**
+ * Define a new command.
+ *
+ * @param   string          name            Name of command.
+ * @param   object          settings        Optional additional settings.
+ * @return  command                         Instance of new command object.
+ */
+args.prototype.addCommand = function(name, settings)
+{
+    if (name != 'help') {
+        // add implicit help command
+        var me = this;
+
+        var cmd = command.prototype.addCommand.call(this, 'help', {
+            'help':   'Help',
+            'action': function() {
+                me.printHelp();
+            }
+        });
+        cmd.addOperand('command', 1, {
+            'help': 'Command to get help for.'
+        });
+    }
+
+    return command.prototype.addCommand.call(this, name, settings);
+}
+
+/**
  * Parse arguments for command. Uses 'process.argv' if no parameter is specified.
  *
  * @param   array            argv       Optional array of arguments.
