@@ -38,8 +38,10 @@ args.prototype.setVersion = function(str)
 
 /**
  * Print help.
+ *
+ * @param   string          command         Optional command to print help for.
  */
-args.prototype.printHelp = function()
+args.prototype.printHelp = function(command)
 {
 }
 
@@ -58,8 +60,8 @@ args.prototype.addCommand = function(name, settings)
 
         var cmd = command.prototype.addCommand.call(this, 'help', {
             'help':   'Help',
-            'action': function() {
-                me.printHelp();
+            'action': function(options, operands) {
+                me.printHelp(operands.command[0]);
             }
         });
         cmd.addOperand('command', 1, {
