@@ -75,11 +75,12 @@ command.prototype.setAction = function(fn)
  * Define a new command.
  *
  * @param   string          name            Name of command.
+ * @param   object          settings        Optional additional settings.
  * @return  command                         Instance of new command object.
  */
-command.prototype.addCommand = function(name)
+command.prototype.addCommand = function(name, settings)
 {
-    this.commands[name] = new command(name);
+    this.commands[name] = new command(name, settings);
 
     return this.commands[name];
 }
@@ -190,7 +191,7 @@ command.prototype.getMinRemaining = function(n)
  */
 command.prototype.processOperands = function(args)
 {
-    var name, remaining;
+    var name, remaining, cnt;
 
     var operand = null;
     var ret = {};
@@ -218,7 +219,11 @@ command.prototype.processOperands = function(args)
             remaining = this.getMinRemaining(op);
         }
 
-        if (minmax[0] > ret[metavar] || (minmax[1] === Infinity && remaining > args.length)) {
+        cnt = (typeof ret[name] != 'undefined'
+                ? ret[name].length
+                : 0);
+
+        if (minmax[0] > cnt || (minmax[1] === Infinity && remaining > args.length)) {
             // expected operand
             arg = args.shift();
 
@@ -228,7 +233,7 @@ command.prototype.processOperands = function(args)
             }
 
             operand.update(arg);
-            ret[operand.getName()] = operand.getData();
+            ret[name] = operand.getData();
         } else {
             // trigger fetching next operand
             operand = null;
