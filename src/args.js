@@ -6,15 +6,30 @@
  */
 
 var command = require('./command.js');
+var extend = require('util')._extend;
 
 /**
  * Constructor.
+ *
+ * @param   object          settings        Optional settings.
  */
-function args()
+function args(settings)
 {
-    command.apply(this);
+    settings = extend(
+        {
+            'version':        null,
+            'version_string': '{version}'
+        },
+        settings
+    );
+
+    command.call(this, '', settings);
 
     this.version = null;
+
+    if (this.settings.version !== null) {
+        this.setVersion(this.settings.verion);
+    }
 }
 
 /**
@@ -27,13 +42,34 @@ args.prototype.constructor = args;
  * Setter for the application version.
  *
  * @param   string          str         Version string.
+ * @param   string
  * @return  app                         Returns class instance.
  */
 args.prototype.setVersion = function(str)
 {
-    this.version = str;
+    if (this.version === null) {
+        this.version = str;
+
+        // add implicit --version option
+        var me = this;
+
+        command.prototype.addOption.call(this, 'version', 'bool', ['--version'], {
+            'help': 'Print version info.'
+        }).setAction(function() {
+            me.printVersion();
+        });
+    }
 
     return this;
+}
+
+/**
+ * Print versin.
+ */
+args.prototype.printVersion = function()
+{
+    console.log(this.version);
+    process.exit(1);
 }
 
 /**
