@@ -52,10 +52,10 @@ function option(name, type, flags, settings)
         case 'list':
             this.data = (Object.prototype.toString.call(settings.default) === '[object Array]'
                             ? settings.default
-                            : []);
+                            : null);
             break;
         case 'value':
-            this.data = (/boolean|number|string/.test(settings.default)
+            this.data = (/boolean|number|string/.test(typeof settings.default)
                             ? '' + settings.default
                             : null);
             break;
@@ -161,7 +161,7 @@ option.prototype.takesValue = function()
  */
 option.prototype.getData = function()
 {
-    return (this.type == 'list'
+    return (this.type == 'list' && this.data !== null
             ? this.data.slice(0)
             : this.data);
 }
@@ -182,7 +182,11 @@ option.prototype.update = function(value)
             this.data++;
             break;
         case 'list':
-            this.data.push(value);
+            if (this.data === null) {
+                this.data = [value];
+            } else {
+                this.data.push(value);
+            }
             break;
         case 'value':
             this.data = value;
