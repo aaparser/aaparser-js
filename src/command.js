@@ -164,14 +164,14 @@ command.prototype.getMinRemaining = function(n)
 }
 
 /**
- * Validate operands.
+ * Process and validate operands.
  *
  * @param   array           args            Operandal arguments to validate.
  * @return  object                          Validated arguments.
  */
-command.prototype.validateOperands = function(args)
+command.prototype.processOperands = function(args)
 {
-    var metavar, remaining;
+    var name, remaining;
 
     var operand = null;
     var ret = {};
@@ -192,16 +192,11 @@ command.prototype.validateOperands = function(args)
             operand = this.operands[op];
 
             minmax = operand.getExpected();
-            metavar = operand.getMetaVar();
+            name = operand.getName();
 
             ++op;
 
             remaining = this.getMinRemaining(op);
-
-            if (!(metavar in ret)) {
-                // initialize return value for operand
-                ret[metavar] = [];
-            }
         }
 
         if (minmax[0] > ret[metavar] || (minmax[1] === Infinity && remaining > args.length)) {
@@ -213,7 +208,8 @@ command.prototype.validateOperands = function(args)
                 process.exit(1);
             }
 
-            ret[metavar].push(arg);
+            operand.update(arg);
+            ret[operand.getName()] = operand.getData();
         } else {
             // trigger fetching next operand
             operand = null;
@@ -273,18 +269,18 @@ command.prototype.parse = function(argv)
                         console.log('invalid value for argument "' + match[1] + '"')
                         process.exit(1);
                     } else {
-                        option.updateValue(arg);
+                        option.update(arg);
                     }
                 } else {
                     console.log('value missing for argument "' + match[1] + '"');
                     process.exit(1);
                 }
             } else {
-                option.updateValue();
+                option.update();
             }
 
-            option.action(option.value);
-            options[option.getId()] = option;
+            // option.action(option.value);
+            options[option.getName()] = option.getValue();
 
             if (match[2].length > 0) {
                 // push back combined short argument
@@ -295,7 +291,7 @@ command.prototype.parse = function(argv)
             args.push(arg);
         } else if (arg in this.commands) {
             // sub command
-            args = this.validateOperands(args);
+            args = this.processOperands(args);
 
             this.action(options, args);
 
@@ -307,7 +303,7 @@ command.prototype.parse = function(argv)
         }
     }
 
-    args = this.validateOperands(args);
+    args = this.processOperands(args);
 
     this.action(options, args);
 }

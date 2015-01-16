@@ -8,12 +8,23 @@
 /**
  * Constructor.
  *
+ * @param   string          name            Internal name of operand.
  * @param   int|string      num             Number of arguments.
- * @param   string          metavar         Optional variable name for usage information.
- * @param   array           values          Optional default values.
+ * @param   object          options         Optional additional settings.
  */
-function operand(num, metavar, values)
+function operand(name, num, options)
 {
+    options = extend(
+        {
+            'variable': name,
+            'default':  [],
+            'help':     '',
+            'required': false,
+            'action':   function() {}
+        },
+        options
+    );
+
     if (parseFloat(num) == parseInt(num) && !isNaN(num) && num > 0) {
         this.num = num;
     } else if (num === '?' || num === '*' || num === '+') {
@@ -22,31 +33,22 @@ function operand(num, metavar, values)
         throw 'either an integer > 0 or one of the characters \'?\', \'*\' or \'+\' are required as first parameter. Input was: ' + num;
     }
 
-    this.metavar = metavar || 'arg';
-    this.values = values;
+    this.name = name;
+    this.options = options;
 
-    this.description = '';
+    this.index = 0;
+    this.data = options.default;
     this.validators = [];
 }
 
 /**
- * Set help description.
+ * Return option name.
  *
- * @param   string          description     Help description for operand.
+ * @return  string                          Name of option.
  */
-operand.prototype.setHelp = function(description)
+operand.prototype.getName = function()
 {
-    this.description = description;
-}
-
-/**
- * Return meta variable for operand.
- *
- * @return  string                          Meta variable.
- */
-operand.prototype.getMetaVar = function()
-{
-    return this.metavar;
+    return this.name;
 }
 
 /**
@@ -98,6 +100,33 @@ operand.prototype.isValid = function(value)
     }
 
     return ret;
+}
+
+/**
+ * Return stored data up to the current index.
+ *
+ * @return  mixed                           Data of option.
+ */
+operand.prototype.getData = function()
+{
+    return this.data.slice(0, this.index);
+}
+
+/**
+ * Update operand data.
+ *
+ * @param   mixed           value           Value to add.
+ */
+operand.prototype.update = function(value)
+{
+    ++this.index;
+
+    if (this.index > this.data.length) {
+        this.data.push(value);
+    } else {
+        // overwrite default value
+        this.data[this.index - 1] = value;
+    }
 }
 
 // export

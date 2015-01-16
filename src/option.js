@@ -20,41 +20,53 @@ var option_vtypes = [types.value, types.list];
 /**
  * Constructor.
  *
- * @param   string          name            Internal name of option.
+ * @param   string          name            Name of option.
  * @param   string          type            Type of option.
  * @param   array           flags           Option flags.
  * @param   object          options         Optional additional settings.
- *
- * @param   array           flags           Option flags.
- * @param   int             settings        Settings as bit-field.
- * @param   string          metavar         Optional variable name for usage information.
- * @param   mixed           value           Optional default value
  */
 function option(name, type, flags, options)
 {
-    options = extend(
-        {
-            'variable': 'arg',
-            'default': null,
-            'choice': [],
-            'help': '',
-            'required': false,
-            'append': false,
-            'action': function() {}
-        }, 
-        options
-    );
-
     if (!(type in option_types)) {
         throw 'invalid option type "' + type + '"';
     }
 
-    this.name = name;
-    this.value = null;
+    options = extend(
+        {
+            'variable': name,
+            'default':  (type == option.type.bool ? false : null),
+            'store':    (type == option.type.bool ? true : null),
+            'help':     '',
+            'required': false,
+            'action':   function() {}
+        },
+        options
+    );
+
+    this.data = null;
     this.flags = flags;
     this.options = options;
 
-    this.setDefaultValue(this.options.default);
+    switch (this.options.type) {
+        case option.type.bool:
+            this.data = !!options.default;
+            break;
+        case option.type.count:
+            this.data = (parseFloat(options.default) == parseInt(options.default) && !isNaN(options.default)
+                            ? options.default
+                            : 0);
+            break;
+        case option.type.list:
+            this.data = (Object.prototype.toString.call(options.default) === '[object Array]'
+                            ? options.default
+                            : []);
+            break;
+        case option.type.value:
+            this.data = (/boolean|number|string/.test(options.default)
+                            ? '' + options.default
+                            : null);
+            break;
+    }
 
     this.validators = [];
 }
@@ -65,6 +77,16 @@ function option(name, type, flags, options)
 option.type = option_types;
 
 /**
+ * Return option name.
+ *
+ * @return  string                          Name of option.
+ */
+option.prototype.getName = function()
+{
+    return this.name;
+}
+
+/**
  * Set action to call if option appears in arguments.
  *
  * @param   callable        fn              Function to call.
@@ -72,26 +94,6 @@ option.type = option_types;
 option.prototype.setAction = function(fn)
 {
     this.options.action = fn;
-}
-
-/**
- * Set help description.
- *
- * @param   string          str             Help string for option.
- */
-option.prototype.setHelp = function(str)
-{
-    this.options.help = str;
-}
-
-/**
- * Return internal name of option.
- *
- * @return  string                          Name of option.
- */
-option.prototype.getName = function()
-{
-    return this.name;
 }
 
 /**
@@ -155,73 +157,37 @@ option.prototype.takesValue = function()
 }
 
 /**
- * Return value of option.
+ * Return stored data.
  *
- * @return  mixed                           Value of option.
+ * @return  mixed                           Data of option.
  */
-option.prototype.getValue = function()
+option.prototype.getData = function()
 {
-    return this.value;
+    return (this.type == option.type.list
+            ? this.data.slice(0)
+            : this.data);
 }
 
 /**
- * Update value of option according to it's set 'action' option. This should only
- * be used to set/update the option value for a parsed option. See 'setDefaultValue'
- * for modifying the default value for an option.
+ * Update option value(s) according to it's set 'type'. This should only be used to update the option
+ * value(s) during option parsing.
  *
- * @param   mixed           value           Optional value to set (ignored for 'action' == 'count').
- * @param   bool            validate        Optionally validate value (default: true, ignored for 'action' == 'count').
+ * @param   mixed           value           Optional value to set (ignored for 'type' == 'count' and 'type' == 'bool').
  */
-option.prototype.updateValue = function(value, validate)
-{
-    if (!this.takesValue()) {
-        // does not take a value
-        if (this.type == option.settings.T_COUNT) {
-            // counter
-            this.value++;
-        } else {
-            // switch
-            this.value = !this.default;
-        }
-    } else {
-        validate = (typeof validate == 'undefined' ? true : !!validate);
-
-        if (validate && this.isValid(value)) {
-            if (this.type == option.settings.T_VALUE) {
-                this.value = value;
-            } else {
-                this.value.push(value);
-            }
-        }
-    }
-}
-
-/**
- * Overwrite the default value for this option. Note that this method will silently ignore
- * invalid values and will initialize the value instead.
- *
- * @param   mixed           value           Value to set.
- */
-option.prototype.setDefaultValue = function(value)
+option.prototype.update = function(value)
 {
     switch (this.options.type) {
         case option.type.bool:
-            this.value = !!value;
+            this.data = !!this.options.store;
             break;
         case option.type.count:
-            this.value = (parseFloat(num) == parseInt(num) && !isNaN(num)
-                            ? value
-                            : 0);
+            this.data++;
             break;
         case option.type.list:
-            this.value = (Object.prototype.toString.call(value) === '[object Array]' 
-                            ? value 
-                            : []);
+            this.data.push(value);
             break;
         case option.type.value:
-            this.value = (/boolean|number|string/.test(value) 
-                            ? '' + value 
-                            : null);
+            this.data = value;
             break;
     }
 }
