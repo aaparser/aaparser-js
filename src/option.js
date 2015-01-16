@@ -7,15 +7,14 @@
 
 var extend = require('util')._extend;
 
-
 var option_types = {
-    bool:   1,
-    value:  2,
-    count:  3,
-    list:   4
+    bool:   'bool',
+    value:  'value',
+    count:  'count',
+    list:   'list'
 }
 
-var option_vtypes = [types.value, types.list];
+var option_vtypes = [option_types.value, option_types.list];
 
 /**
  * Constructor.
@@ -23,15 +22,15 @@ var option_vtypes = [types.value, types.list];
  * @param   string          name            Name of option.
  * @param   string          type            Type of option.
  * @param   array           flags           Option flags.
- * @param   object          options         Optional additional settings.
+ * @param   object          settings        Optional additional settings.
  */
-function option(name, type, flags, options)
+function option(name, type, flags, settings)
 {
     if (!(type in option_types)) {
         throw 'invalid option type "' + type + '"';
     }
 
-    options = extend(
+    settings = extend(
         {
             'variable': name,
             'default':  (type == option.type.bool ? false : null),
@@ -40,30 +39,30 @@ function option(name, type, flags, options)
             'required': false,
             'action':   function() {}
         },
-        options
+        settings
     );
 
     this.data = null;
     this.flags = flags;
-    this.options = options;
+    this.settings = settings;
 
-    switch (this.options.type) {
+    switch (this.settings.type) {
         case option.type.bool:
-            this.data = !!options.default;
+            this.data = !!settings.default;
             break;
         case option.type.count:
-            this.data = (parseFloat(options.default) == parseInt(options.default) && !isNaN(options.default)
-                            ? options.default
+            this.data = (parseFloat(settings.default) == parseInt(settings.default) && !isNaN(settings.default)
+                            ? settings.default
                             : 0);
             break;
         case option.type.list:
-            this.data = (Object.prototype.toString.call(options.default) === '[object Array]'
-                            ? options.default
+            this.data = (Object.prototype.toString.call(settings.default) === '[object Array]'
+                            ? settings.default
                             : []);
             break;
         case option.type.value:
-            this.data = (/boolean|number|string/.test(options.default)
-                            ? '' + options.default
+            this.data = (/boolean|number|string/.test(settings.default)
+                            ? '' + settings.default
                             : null);
             break;
     }
@@ -75,6 +74,16 @@ function option(name, type, flags, options)
  * Option types.
  */
 option.type = option_types;
+
+/**
+ * Set help text.
+ *
+ * @param   string          str             Help text.
+ */
+option.prototype.setHelp = function(str)
+{
+    this.settings.help = str;
+}
 
 /**
  * Return option name.
@@ -93,7 +102,7 @@ option.prototype.getName = function()
  */
 option.prototype.setAction = function(fn)
 {
-    this.options.action = fn;
+    this.settings.action = fn;
 }
 
 /**
@@ -113,7 +122,7 @@ option.prototype.addValidator = function(fn)
  */
 option.prototype.isRequired = function()
 {
-    return !!this.options.required;
+    return !!this.settings.required;
 }
 
 /**
@@ -153,7 +162,7 @@ option.prototype.isValid = function(value)
  */
 option.prototype.takesValue = function()
 {
-    return (option_vtypes.indexOf(this.options.type) >= 0);
+    return (option_vtypes.indexOf(this.settings.type) >= 0);
 }
 
 /**
@@ -176,9 +185,9 @@ option.prototype.getData = function()
  */
 option.prototype.update = function(value)
 {
-    switch (this.options.type) {
+    switch (this.settings.type) {
         case option.type.bool:
-            this.data = !!this.options.store;
+            this.data = !!this.settings.store;
             break;
         case option.type.count:
             this.data++;

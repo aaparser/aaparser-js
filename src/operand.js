@@ -5,16 +5,18 @@
  * @author      Harald Lapp <harald@octris.org>
  */
 
+var extend = require('util')._extend;
+
 /**
  * Constructor.
  *
  * @param   string          name            Internal name of operand.
  * @param   int|string      num             Number of arguments.
- * @param   object          options         Optional additional settings.
+ * @param   object          settings        Optional additional settings.
  */
-function operand(name, num, options)
+function operand(name, num, settings)
 {
-    options = extend(
+    settings = extend(
         {
             'variable': name,
             'default':  [],
@@ -22,7 +24,7 @@ function operand(name, num, options)
             'required': false,
             'action':   function() {}
         },
-        options
+        settings
     );
 
     if (parseFloat(num) == parseInt(num) && !isNaN(num) && num > 0) {
@@ -34,17 +36,27 @@ function operand(name, num, options)
     }
 
     this.name = name;
-    this.options = options;
+    this.settings = settings;
 
     this.index = 0;
-    this.data = options.default;
+    this.data = settings.default;
     this.validators = [];
 }
 
 /**
- * Return option name.
+ * Set help text.
  *
- * @return  string                          Name of option.
+ * @param   string          str             Help text.
+ */
+operand.prototype.setHelp = function(str)
+{
+    this.settings.help = str;
+}
+
+/**
+ * Return operand name.
+ *
+ * @return  string                          Name of operand.
  */
 operand.prototype.getName = function()
 {

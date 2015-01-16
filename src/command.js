@@ -8,19 +8,31 @@
 var option = require('./option.js');
 var operand = require('./operand.js');
 var events = require('events');
+var extend = require('util')._extend;
 
 /**
  * Constructor.
+ *
+ * @param   string          name            Name of command.
+ * @param   object          settings        Optional additional settings.
  */
-function command(name)
+function command(name, settings)
 {
+    settings = extend(
+        {
+            'help':     '',
+            'action':   function() {}
+        },
+        settings
+    );
+
+    this.name = name;
+    this.settings = settings;
+
     this.commands = {};
     this.options = [];
     this.operands = [];
     this.map = {};
-
-    this.description = '';
-    this.action = function() {};
 }
 
 /**
@@ -30,16 +42,23 @@ command.prototype = Object.create(events.EventEmitter.prototype);
 command.prototype.constructor = command;
 
 /**
- * Setter for the command description.
+ * Set help text.
  *
- * @param   string          str         Command description.
- * @return  string|app                  Returns class instance.
+ * @param   string          str             Help text.
  */
-command.prototype.setDescription = function(str)
+command.prototype.setHelp = function(str)
 {
-    this.description = str;
+    this.settings.help = str;
+}
 
-    return this;
+/**
+ * Return command name.
+ *
+ * @return  string                          Name of command.
+ */
+command.prototype.getName = function()
+{
+    return this.name;
 }
 
 /**
@@ -49,7 +68,7 @@ command.prototype.setDescription = function(str)
  */
 command.prototype.setAction = function(fn)
 {
-    this.action = fn;
+    this.settings.action = fn;
 }
 
 /**
@@ -293,7 +312,7 @@ command.prototype.parse = function(argv)
             // sub command
             args = this.processOperands(args);
 
-            this.action(options, args);
+            this.settings.action(options, args);
 
             this.commands[arg].parse(argv);
         } else {
@@ -305,7 +324,7 @@ command.prototype.parse = function(argv)
 
     args = this.processOperands(args);
 
-    this.action(options, args);
+    this.settings.action(options, args);
 }
 
 // export
