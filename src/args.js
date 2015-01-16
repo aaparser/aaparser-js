@@ -1,13 +1,13 @@
 /**
- * Arguments class.
+ * Application class.
  *
  * @copyright   copyright (c) 2015 by Harald Lapp
  * @author      Harald Lapp <harald@octris.org>
  */
 
 var command = require('./command.js');
-var option = require('./option.js');
 
+var option = require('./option.js');
 /**
  * Constructor.
  */
@@ -25,9 +25,9 @@ args.prototype = Object.create(command.prototype);
 args.prototype.constructor = args;
 
 /**
- * Option settings.
+ * Option types.
  */
-args.option = option.settings;
+args.option = option.type;
 
 /**
  * Setter for the application version.
@@ -39,57 +39,7 @@ args.prototype.setVersion = function(str)
 {
     this.version = str;
 
-    // add implicit --version option
-    var me = this;
-
-    this.addOption(['--version']).setAction(function() {
-        me.printVersion();
-    });
-
     return this;
-}
-
-/**
- * Print version string.
- */
-args.prototype.printVersion = function()
-{
-    console.log(this.version);
-}
-
-/**
- * Print help.
- *
- * @param   object          options         Parsed options.
- * @param   object          operands        Parsed operands.
- */
-args.prototype.printHelp = function(options, operands)
-{
-    console.log('HELP', options, operands);
-    process.exit(1);
-}
-
-/**
- * Define a new command.
- *
- * @param   string          name            Name of command.
- * @return  command                         Instance of new command object.
- */
-args.prototype.addCommand = function(name)
-{
-    if (name != 'help' && !('help' in this.commands)) {
-        // add implicit help command as soon as the first command get's added
-        var me = this;
-        var cmd = command.prototype.addCommand.call(this, 'help');
-        cmd.setAction(function(options, operands) {
-            me.printHelp(options, operands);
-        });
-        cmd.addOperand(1);
-    }
-
-    this.commands[name] = new command(name);
-
-    return this.commands[name];
 }
 
 /**
@@ -100,15 +50,9 @@ args.prototype.addCommand = function(name)
 args.prototype.parse = function(argv)
 {
     if (typeof argv == 'undefined') {
-        argv = process.argv.slice(2);
+        argv = process.argv.slice(1);
     }
-
-    var me = this;
-
-    this.addOption(['--help']).setAction(function() {
-        me.printHelp();
-    });
-
+    
     command.prototype.parse.call(this, argv.slice(0));
 }
 

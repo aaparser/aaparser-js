@@ -5,56 +5,64 @@
  * @author      Harald Lapp <harald@octris.org>
  */
 
+var extend = require('util')._extend;
+
+
+var option_types = {
+    bool:   1,
+    value:  2,
+    count:  3,
+    list:   4
+}
+
+var option_vtypes = [types.value, types.list];
+
 /**
  * Constructor.
+ *
+ * @param   string          name            Internal name of option.
+ * @param   string          type            Type of option.
+ * @param   array           flags           Option flags.
+ * @param   object          options         Optional additional settings.
  *
  * @param   array           flags           Option flags.
  * @param   int             settings        Settings as bit-field.
  * @param   string          metavar         Optional variable name for usage information.
  * @param   mixed           value           Optional default value
  */
-function option(flags, settings, metavar, value)
+function option(name, type, flags, options)
 {
-    settings = settings || option.settings.T_SWITCH;
+    options = extend(
+        {
+            'variable': 'arg',
+            'default': null,
+            'choice': [],
+            'help': '',
+            'required': false,
+            'append': false,
+            'action': function() {}
+        }, 
+        options
+    );
 
-    this.flags = flags;
-    this.metavar = metavar || 'arg';
-
-    this.type = settings & 0xff;
-    this.required = ((settings & option.settings.T_REQUIRED) == option.settings.T_REQUIRED);
-    this.default = value;
-
-    this.description = '';
-
-    if (typeof value !== 'undefined') {
-        this.setDefaultValue(value);
-    } else {
-        if (this.type == option.settings.T_COUNT) {
-            this.value = 0;
-        } else if (this.type == option.settings.T_LIST) {
-            this.value = [];
-        } else {
-            this.value = true;
-        }
+    if (!(type in option_types)) {
+        throw 'invalid option type "' + type + '"';
     }
 
-    this.default = this.value;
+    this.name = name;
+    this.value = null;
+    this.flags = flags;
+    this.options = options;
+
+    this.setDefaultValue(this.options.default);
 
     this.validators = [];
-
-    this.action = function() {};
 }
 
 /**
- * Option settings.
+ * Option types.
  */
-option.settings = {
-    T_SWITCH      :   1,
-    T_VALUE       :   3,
-    T_LIST        :   7,
-    T_COUNT       :  31,
-    T_REQUIRED    : 256
-};
+option.type = option_types;
 
 /**
  * Set action to call if option appears in arguments.
@@ -63,27 +71,27 @@ option.settings = {
  */
 option.prototype.setAction = function(fn)
 {
-    this.action = fn;
+    this.options.action = fn;
 }
 
 /**
  * Set help description.
  *
- * @param   string          description     Help description for option.
+ * @param   string          str             Help string for option.
  */
-option.prototype.setHelp = function(description)
+option.prototype.setHelp = function(str)
 {
-    this.description = description;
+    this.options.help = str;
 }
 
 /**
- * Return ID of option (which is currently only a join of the option-flags).
+ * Return internal name of option.
  *
- * @return  int                             Option ID.
+ * @return  string                          Name of option.
  */
-option.prototype.getId = function()
+option.prototype.getName = function()
 {
-    return this.flags.join('');
+    return this.name;
 }
 
 /**
@@ -103,7 +111,7 @@ option.prototype.addValidator = function(fn)
  */
 option.prototype.isRequired = function()
 {
-    return this.required;
+    return !!this.options.required;
 }
 
 /**
@@ -143,8 +151,7 @@ option.prototype.isValid = function(value)
  */
 option.prototype.takesValue = function()
 {
-    return (this.type == option.settings.T_VALUE ||
-            this.type == option.settings.T_LIST);
+    return (option_vtypes.indexOf(this.options.type) >= 0);
 }
 
 /**
@@ -197,12 +204,25 @@ option.prototype.updateValue = function(value, validate)
  */
 option.prototype.setDefaultValue = function(value)
 {
-    if (this.type == option.settings.T_COUNT) {
-        this.value = (!isNaN(value) ? value : 0);
-    } else if (this.type == option.settings.T_LIST) {
-        this.value = (Object.prototype.toString.call(value) === '[object Array]' ? value : []);
-    } else {
-        this.value = (/boolean|number|string/.test(value) ? value : true);
+    switch (this.options.type) {
+        case option.type.bool:
+            this.value = !!value;
+            break;
+        case option.type.count:
+            this.value = (parseFloat(num) == parseInt(num) && !isNaN(num)
+                            ? value
+                            : 0);
+            break;
+        case option.type.list:
+            this.value = (Object.prototype.toString.call(value) === '[object Array]' 
+                            ? value 
+                            : []);
+            break;
+        case option.type.value:
+            this.value = (/boolean|number|string/.test(value) 
+                            ? '' + value 
+                            : null);
+            break;
     }
 }
 

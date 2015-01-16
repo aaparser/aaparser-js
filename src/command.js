@@ -68,15 +68,15 @@ command.prototype.addCommand = function(name)
 /**
  * Create a new option for command.
  *
+ * @param   string          name            Internal name of option.
+ * @param   string          type            Type of option.
  * @param   array           flags           Option flags.
- * @param   int             settings        Settings as bit-field.
- * @param   string          metavar         Optional variable name for usage information.
- * @param   mixed           value           Optional default value
+ * @param   object          options         Optional additional settings.
  * @return  Option                          Instance of created option.
  */
-command.prototype.addOption = function(flags, settings, metavar, value)
+command.prototype.addOption = function(name, type, flags, options)
 {
-    var ret = new option(flags, settings, metavar, value);
+    var ret = new option(name, type, flags, options);
 
     this.options.push(ret);
 
@@ -86,13 +86,14 @@ command.prototype.addOption = function(flags, settings, metavar, value)
 /**
  * Create a new operand (positional argument).
  *
+ * @param   string          name            Internal name of operand.
  * @param   int|string      num             Number of arguments.
- * @param   string          metavar         Optional variable name for usage information.
- * @param   array           values          Optional default values.
+ * @param   object          options         Optional additional settings.
+ * @return  Operand                         Instance of created operand.
  */
-command.prototype.addOperand = function(num, metavar, values)
+command.prototype.addOperand = function(name, num, options)
 {
-    var ret = new operand(num, metavar, values);
+    var ret = new operand(name, num, options);
 
     this.operands.push(ret);
 

@@ -22,7 +22,7 @@ function operand(num, metavar, values)
         throw 'either an integer > 0 or one of the characters \'?\', \'*\' or \'+\' are required as first parameter. Input was: ' + num;
     }
 
-    this.metavar = metavar;
+    this.metavar = metavar || 'arg';
     this.values = values;
 
     this.description = '';
