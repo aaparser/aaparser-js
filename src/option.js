@@ -42,11 +42,14 @@ function option(name, type, flags, settings)
         settings
     );
 
+    this.name = name;
+    this.type = type;
+
     this.data = null;
     this.flags = flags;
     this.settings = settings;
 
-    switch (this.settings.type) {
+    switch (this.type) {
         case option.type.bool:
             this.data = !!settings.default;
             break;
@@ -162,7 +165,7 @@ option.prototype.isValid = function(value)
  */
 option.prototype.takesValue = function()
 {
-    return (option_vtypes.indexOf(this.settings.type) >= 0);
+    return (option_vtypes.indexOf(this.type) >= 0);
 }
 
 /**
@@ -185,7 +188,7 @@ option.prototype.getData = function()
  */
 option.prototype.update = function(value)
 {
-    switch (this.settings.type) {
+    switch (this.type) {
         case option.type.bool:
             this.data = !!this.settings.store;
             break;

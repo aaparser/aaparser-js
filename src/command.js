@@ -299,7 +299,7 @@ command.prototype.parse = function(argv)
             }
 
             // option.action(option.value);
-            options[option.getName()] = option.getValue();
+            options[option.getName()] = option.getData();
 
             if (match[2].length > 0) {
                 // push back combined short argument
