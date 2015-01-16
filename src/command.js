@@ -302,6 +302,7 @@ command.prototype.parse = function(argv)
                         process.exit(1);
                     } else {
                         option.update(arg);
+                        option.settings.action(arg);
                     }
                 } else {
                     console.log('value missing for argument "' + match[1] + '"');
@@ -309,6 +310,7 @@ command.prototype.parse = function(argv)
                 }
             } else {
                 option.update();
+                option.settings.action();
             }
 
             // option.action(option.value);
