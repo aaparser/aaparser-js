@@ -80,7 +80,7 @@ args.prototype.printVersion = function()
 args.prototype.printHelp = function(command)
 {
     require('./help.js')(this);
-    
+
     process.exit(1);
 }
 
@@ -100,7 +100,11 @@ args.prototype.addCommand = function(name, settings)
         var cmd = command.prototype.addCommand.call(this, 'help', {
             'help':   'Help',
             'action': function(options, operands) {
-                me.printHelp(operands.command[0]);
+                var command = (command in operands
+                                ? operands.command[0]
+                                : undefined);
+
+                me.printHelp(command);
             }
         });
         cmd.addOperand('command', '?', {
