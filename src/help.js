@@ -57,8 +57,17 @@ help.prototype.printHelp = function(command)
         });
     }
     
-    if (command.commands.length > 0) {
+    for (i in command.commands) {
         console.log('\nCommands:');
+        
+        var names = Object.keys(command.commands).sort();
+        var size = names.reduce(function(size, name) {
+            return Math.max(size, name.length);
+        }, 0);
+        
+        console.log(names, size);
+
+        break;
     }
 }
 
