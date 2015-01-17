@@ -79,6 +79,9 @@ args.prototype.printVersion = function()
  */
 args.prototype.printHelp = function(command)
 {
+    require('./help.js')(this);
+    
+    process.exit(1);
 }
 
 /**

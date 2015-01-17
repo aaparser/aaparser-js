@@ -52,6 +52,30 @@ command.prototype.setHelp = function(str)
 }
 
 /**
+ * Get usage infomation.
+ *
+ * @return  array                           Usage information.
+ */
+command.prototype.getUsage = function()
+{
+    var usage = [];
+
+    this.options.forEach(function(option) {
+        usage.push(option.getUsage());
+    });
+    this.operands.forEach(function(operand) {
+        usage.push(operand.getUsage());
+    });
+    
+    for (var i in this.commands) {
+        usage.push('<command> [ARGUMENTS]');
+        break;
+    }
+
+    return usage;
+}
+
+/**
  * Return command name.
  *
  * @return  string                          Name of command.

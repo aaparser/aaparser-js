@@ -75,6 +75,33 @@ option.prototype.setHelp = function(str)
 }
 
 /**
+ * Get usage infomation.
+ *
+ * @return  string                          Usage information.
+ */
+option.prototype.getUsage = function()
+{
+    var usage = this.flags.join(' | ');
+    var ch;
+
+    if (this.settings.required) {
+        if (this.flags.length > 1) {
+            ch = ['(', ')'];
+        } else {
+            ch = ['', ''];
+        }
+    } else {
+        ch = ['[', ']'];
+    }
+
+    if (this.takesValue()) {
+        usage = usage + ' <' + this.settings.variable + '>';
+    }
+
+    return ch[0] + usage + ch[1];
+}
+
+/**
  * Return option name.
  *
  * @return  string                          Name of option.
