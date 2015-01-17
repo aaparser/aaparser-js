@@ -331,8 +331,9 @@ command.prototype.parse = function(argv)
 
             this.commands[arg].parse(argv);
         } else {
-            console.log('too many arguments for "' + arg + '"');
-            process.exit(1);
+            argv.unshift(arg);
+            // console.log('too many arguments for "' + arg + '"');
+            // process.exit(1);
             break;  // no further arguments should be parsed
         }
     }
