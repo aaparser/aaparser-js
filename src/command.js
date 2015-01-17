@@ -66,7 +66,7 @@ command.prototype.getUsage = function()
     this.operands.forEach(function(operand) {
         usage.push(operand.getUsage());
     });
-    
+
     for (var i in this.commands) {
         usage.push('<command> [ARGUMENTS]');
         break;
@@ -247,7 +247,7 @@ command.prototype.processOperands = function(args)
                 ? ret[name].length
                 : 0);
 
-        if (minmax[0] > cnt || (minmax[1] === Infinity && remaining > args.length)) {
+        if (minmax[1] > cnt || (minmax[1] === Infinity && remaining > args.length)) {
             // expected operand
             arg = args.shift();
 
