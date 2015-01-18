@@ -108,7 +108,7 @@ args.prototype.addCommand = function(name, settings)
                 me.printHelp(command);
             }
         });
-        cmd.addOperand('command', '?', {
+        cmd.addOperand('command', '*', {
             'help': 'Command to get help for.'
         });
     }
