@@ -25,9 +25,9 @@ help.prototype.printHelp = function(command)
     var tree = []
 
     do {
-        tree.unshift(cmd.name);
+        tree.unshift(cmd.getName());
 
-        cmd = cmd.parent;
+        cmd = cmd.getParent();
     } while (cmd !== null);
 
     var usage = command.getUsage();
@@ -48,37 +48,39 @@ help.prototype.printHelp = function(command)
         console.log(buffer);
     }
 
-    if (command.options.length > 0) {
-        console.log('\nOptions:');
+    if (command.hasOptions() || command.hasOperands() || command.hasCommands()) {
+        console.log();
+    }
 
-        command.options.forEach(function(option) {
-            console.log('    ' + option.flags.join(' | '));
-            console.log(str.wordwrap(option.settings.help, 10, 78) + '\n');
+    if (command.hasOptions()) {
+        console.log('Options:');
+
+        command.getOptions().forEach(function(option) {
+            console.log('    ' + option.getFlags().join(' | '));
+            console.log(str.wordwrap(option.getHelp(), 10, 78) + '\n');
         });
     }
 
-    if (command.operands.length > 0) {
+    if (command.hasOperands()) {
         console.log('Operands:');
 
-        command.operands.forEach(function(operand) {
-            console.log('    ' + operand.name);
-            console.log(str.wordwrap(operand.settings.help, 10, 78) + '\n');
+        command.getOperands().forEach(function(operand) {
+            console.log('    ' + operand.getName());
+            console.log(str.wordwrap(operand.getHelp(), 10, 78) + '\n');
         });
     }
 
-    for (i in command.commands) {
+    if (command.hasCommands()) {
         console.log('Commands:');
 
-        var names = Object.keys(command.commands).sort();
+        var names = Object.keys(command.getCommands()).sort();
         var size = names.reduce(function(size, name) {
             return Math.max(size, name.length);
         }, 0);
 
         names.forEach(function(name) {
-            console.log('    ' + name + str.repeat(' ', size - name.length) + '    ' + command.commands[name].settings.help);
+            console.log('    ' + name + str.repeat(' ', size - name.length) + '    ' + command.commands[name].getHelp());
         });
-
-        break;
     }
 }
 
