@@ -14,9 +14,10 @@ var extend = require('util')._extend;
  * Constructor.
  *
  * @param   string          name            Name of command.
+ * @param   command         parent          Parent command.
  * @param   object          settings        Optional additional settings.
  */
-function command(name, settings)
+function command(name, parent, settings)
 {
     settings = extend(
         {
@@ -32,7 +33,8 @@ function command(name, settings)
     this.commands = {};
     this.options = [];
     this.operands = [];
-    this.map = {};
+
+    this.parent = parent;
 }
 
 /**
@@ -104,7 +106,7 @@ command.prototype.setAction = function(fn)
  */
 command.prototype.addCommand = function(name, settings)
 {
-    this.commands[name] = new command(name, settings);
+    this.commands[name] = new command(name, this, settings);
 
     return this.commands[name];
 }
