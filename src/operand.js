@@ -53,6 +53,16 @@ operand.prototype.setHelp = function(str)
 }
 
 /**
+ * Return help text.
+ *
+ * @return  string                          Help text.
+ */
+operand.prototype.getHelp = function()
+{
+    return this.settings.help;
+}
+
+/**
  * Get usage infomation.
  *
  * @return  string                          Usage information.
@@ -60,14 +70,14 @@ operand.prototype.setHelp = function(str)
 operand.prototype.getUsage = function()
 {
     var usage = [];
-    
+
     if (this.num === '+' || (parseFloat(this.num) == parseInt(this.num) && !isNaN(this.num))) {
         usage.push(
             Array.apply(
-                null, 
+                null,
                 new Array((this.num == '+' ? 1 : this.num))
             ).map(
-                String.prototype.valueOf, 
+                String.prototype.valueOf,
                 '<' + this.settings.variable + '>'
             ).join(' ')
         );

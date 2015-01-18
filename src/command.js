@@ -54,6 +54,16 @@ command.prototype.setHelp = function(str)
 }
 
 /**
+ * Return help text.
+ *
+ * @return  string                          Help text.
+ */
+command.prototype.getHelp = function()
+{
+    return this.settings.help;
+}
+
+/**
  * Get usage infomation.
  *
  * @return  array                           Usage information.
@@ -85,6 +95,16 @@ command.prototype.getUsage = function()
 command.prototype.getName = function()
 {
     return this.name;
+}
+
+/**
+ * Return parent command.
+ *
+ * @return  Command|null                    Parent command.
+ */
+command.prototype.getParent = function()
+{
+    return this.parent;
 }
 
 /**
@@ -144,6 +164,66 @@ command.prototype.addOperand = function(name, num, options)
     this.operands.push(ret);
 
     return ret;
+}
+
+/**
+ * Test if command has subcommands.
+ *
+ * @return  bool                            Returns true, if command has subcommands.
+ */
+command.prototype.hasCommands = function()
+{
+    return Object.keys(this.commands).length > 0;
+}
+
+/**
+ * Return all defined subcommands.
+ *
+ * @return  array                           Commands.
+ */
+command.prototype.getCommands = function()
+{
+    return this.commands;
+}
+
+/**
+ * Test if command has defined operands.
+ *
+ * @return  bool                            Returns true, if command has operands.
+ */
+command.prototype.hasOperands = function()
+{
+    return this.operands.length > 0;
+}
+
+/**
+ * Return all defined operands.
+ *
+ * @return  array                           Operands.
+ */
+command.prototype.getOperands = function()
+{
+    return this.operands.slice(0);
+}
+
+/**
+ * Test if command has defined options.
+ *
+ * @return  bool                            Returns true, if command has options.
+ */
+command.prototype.hasOptions = function()
+{
+    return this.options.length > 0;
+}
+
+/**
+ * Return all defined options.
+ *
+ * @return  array                           Options.
+ */
+command.prototype.getOptions = function()
+{
+    return this.options.slice(0);
 }
 
 /**

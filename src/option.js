@@ -75,6 +75,26 @@ option.prototype.setHelp = function(str)
 }
 
 /**
+ * Return help text.
+ *
+ * @return  string                          Help text.
+ */
+option.prototype.getHelp = function()
+{
+    return this.settings.help;
+}
+
+/**
+ * Return the flags the option corresponds to.
+ *
+ * @return  array                           Corresponding flags.
+ */
+option.prototype.getFlags = function()
+{
+    return this.flags;
+}
+
+/**
  * Get usage infomation.
  *
  * @return  string                          Usage information.
