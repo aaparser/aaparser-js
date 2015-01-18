@@ -101,9 +101,19 @@ args.prototype.addCommand = function(name, settings)
         var cmd = command.prototype.addCommand.call(this, 'help', {
             'help':   'Help',
             'action': function(options, operands) {
-                var command = (command in operands
-                                ? operands.command[0]
-                                : undefined);
+                var command = me;
+
+                if ('command' in operands) {
+                    // resolve actual command
+                    command = operands.command.reduce(function(cmd, name) {
+                        if (!(name in cmd.commands)) {
+                            console.log('unknown command "' + name + '"');
+                            process.exit(1);
+                        }
+
+                        return cmd.commands[name];
+                    }, me);
+                }
 
                 me.printHelp(command);
             }
