@@ -30,5 +30,9 @@ module.exports = {
 
     range: function(value) {
         return value.split('..');
+    },
+
+    value: function(value) {
+        return value;
     }
 }
