@@ -7,11 +7,70 @@
 
 var str = require('./str.js');
 
-/**
- * Constructor.
- */
-function help()
+function getOptionUsage(option)
 {
+    var usage = option.getFlags().join(' | ');
+    var ch;
+
+    if (option.isRequired()) {
+        if (option.getFlags().length > 1) {
+            ch = ['(', ')'];
+        } else {
+            ch = ['', ''];
+        }
+    } else {
+        ch = ['[', ']'];
+    }
+
+    if (option.takesValue()) {
+        usage = usage + ' <' + option.getVariable() + '>';
+    }
+
+    return ch[0] + usage + ch[1];
+}
+
+function getOperandUsage(operand)
+{
+    var usage = [];
+    var minmax = operand.getExpected();
+
+    if (minmax[0] > 0) {
+        usage.push(
+            Array.apply(
+                null,
+                new Array(minmax[0])
+            ).map(
+                String.prototype.valueOf,
+                '<' + operand.getVariable() + '>'
+            ).join(' ')
+        );
+    }
+
+    if (minmax[1] == Infinity) {
+        usage.push('[' + operand.getVariable() + ' ...]');
+    } else if (minmax[0] == 0) {
+        usage.push('[' + operand.getVariable() + ']');
+    }
+
+    return usage.join(' ');
+}
+
+function getUsage(command)
+{
+    var usage = [];
+
+    command.getOptions().forEach(function(option) {
+        usage.push(getOptionUsage(option));
+    });
+    command.getOperands().forEach(function(operand) {
+        usage.push(getOperandUsage(operand));
+    });
+
+    if (command.hasCommands()) {
+        usage.push('<command> [ARGUMENTS]');
+    }
+
+    return usage;
 }
 
 /**
@@ -19,8 +78,11 @@ function help()
  *
  * @param   Command             command             Command to print help for.
  */
-help.prototype.printHelp = function(command)
+function printHelp(command)
 {
+    // collect
+
+    // render usage summary
     var cmd = command;
     var tree = []
 
@@ -30,7 +92,7 @@ help.prototype.printHelp = function(command)
         cmd = cmd.getParent();
     } while (cmd !== null);
 
-    var usage = command.getUsage();
+    var usage = getUsage(command);
     var buffer = ('usage: ' + tree.shift() + ' ' + tree.join(' [ARGUMENTS] ')).replace(/ +$/, '') + ' ';
     var len = buffer.length;
 
@@ -48,6 +110,7 @@ help.prototype.printHelp = function(command)
         console.log(buffer);
     }
 
+    // render lists of available options, operands and subcommands
     if (command.hasOptions() || command.hasOperands() || command.hasCommands()) {
         console.log();
     }
@@ -90,4 +153,4 @@ help.prototype.printHelp = function(command)
 }
 
 // exports
-module.exports = (new help()).printHelp;
+module.exports = printHelp;
