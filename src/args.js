@@ -11,9 +11,10 @@ var extend = require('util')._extend;
 /**
  * Constructor.
  *
+ * @param   string          name            Name of application.
  * @param   object          settings        Optional settings.
  */
-function args(settings)
+function args(name, settings)
 {
     settings = extend(
         {
@@ -23,7 +24,7 @@ function args(settings)
         settings
     );
 
-    command.call(this, '', settings);
+    command.call(this, name, null, settings);
 
     this.version = null;
 
