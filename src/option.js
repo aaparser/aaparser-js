@@ -95,30 +95,13 @@ option.prototype.getFlags = function()
 }
 
 /**
- * Get usage infomation.
+ * Get variable of option.
  *
- * @return  string                          Usage information.
+ * @return  string                          Variable.
  */
-option.prototype.getUsage = function()
+option.prototype.getVariable = function()
 {
-    var usage = this.flags.join(' | ');
-    var ch;
-
-    if (this.settings.required) {
-        if (this.flags.length > 1) {
-            ch = ['(', ')'];
-        } else {
-            ch = ['', ''];
-        }
-    } else {
-        ch = ['[', ']'];
-    }
-
-    if (this.takesValue()) {
-        usage = usage + ' <' + this.settings.variable + '>';
-    }
-
-    return ch[0] + usage + ch[1];
+    return this.settings.variable;
 }
 
 /**

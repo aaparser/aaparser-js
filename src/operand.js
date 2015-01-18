@@ -63,36 +63,6 @@ operand.prototype.getHelp = function()
 }
 
 /**
- * Get usage infomation.
- *
- * @return  string                          Usage information.
- */
-operand.prototype.getUsage = function()
-{
-    var usage = [];
-
-    if (this.num === '+' || (parseFloat(this.num) == parseInt(this.num) && !isNaN(this.num))) {
-        usage.push(
-            Array.apply(
-                null,
-                new Array((this.num == '+' ? 1 : this.num))
-            ).map(
-                String.prototype.valueOf,
-                '<' + this.settings.variable + '>'
-            ).join(' ')
-        );
-    }
-
-    if (this.num === '*' || this.num === '+') {
-        usage.push('[' + this.settings.variable + ' ...]');
-    } else if (this.num == '?') {
-        usage.push('[' + this.settings.variable + ']');
-    }
-
-    return usage.join(' ');
-}
-
-/**
  * Return operand name.
  *
  * @return  string                          Name of operand.
@@ -100,6 +70,16 @@ operand.prototype.getUsage = function()
 operand.prototype.getName = function()
 {
     return this.name;
+}
+
+/**
+ * Get variable of option.
+ *
+ * @return  string                          Variable.
+ */
+operand.prototype.getVariable = function()
+{
+    return this.settings.variable;
 }
 
 /**
