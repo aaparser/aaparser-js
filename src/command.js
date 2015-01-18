@@ -328,7 +328,7 @@ command.prototype.parse = function(argv)
                         process.exit(1);
                     } else {
                         option.update(arg);
-                        option.settings.action(arg);
+                        option.settings.action.call(option, arg);
                     }
                 } else {
                     console.log('value missing for argument "' + match[1] + '"');
@@ -336,7 +336,7 @@ command.prototype.parse = function(argv)
                 }
             } else {
                 option.update();
-                option.settings.action();
+                option.settings.action.apply(option);
             }
 
             // option.action(option.value);
@@ -353,7 +353,7 @@ command.prototype.parse = function(argv)
             // sub command
             operands = this.processOperands(args);
 
-            this.settings.action(options, operands);
+            this.settings.action.call(this, options, operands);
 
             this.commands[arg].parse(argv);
         } else {
@@ -366,7 +366,7 @@ command.prototype.parse = function(argv)
 
     operands = this.processOperands(args);
 
-    this.settings.action(options, operands);
+    this.settings.action.call(this, options, operands);
 }
 
 // export
