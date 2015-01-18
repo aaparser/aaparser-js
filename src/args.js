@@ -106,12 +106,14 @@ args.prototype.addCommand = function(name, settings)
                 if ('command' in operands) {
                     // resolve actual command
                     command = operands.command.reduce(function(cmd, name) {
-                        if (!(name in cmd.commands)) {
+                        var command = cmd.getCommand(name);
+
+                        if (!command) {
                             console.log('unknown command "' + name + '"');
                             process.exit(1);
                         }
 
-                        return cmd.commands[name];
+                        return command;
                     }, me);
                 }
 

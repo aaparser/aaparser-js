@@ -30,7 +30,7 @@ function command(name, parent, settings)
     this.name = name;
     this.settings = settings;
 
-    this.commands = {};
+    this.commands = [];
     this.options = [];
     this.operands = [];
 
@@ -79,9 +79,8 @@ command.prototype.getUsage = function()
         usage.push(operand.getUsage());
     });
 
-    for (var i in this.commands) {
+    if (this.commands.length > 0) {
         usage.push('<command> [ARGUMENTS]');
-        break;
     }
 
     return usage;
@@ -126,9 +125,11 @@ command.prototype.setAction = function(fn)
  */
 command.prototype.addCommand = function(name, settings)
 {
-    this.commands[name] = new command(name, this, settings);
+    var ret = new command(name, this, settings);
 
-    return this.commands[name];
+    this.commands.push(ret);
+
+    return ret;
 }
 
 /**
@@ -173,7 +174,7 @@ command.prototype.addOperand = function(name, num, options)
  */
 command.prototype.hasCommands = function()
 {
-    return Object.keys(this.commands).length > 0;
+    return this.commands.length > 0;
 }
 
 /**
@@ -183,7 +184,27 @@ command.prototype.hasCommands = function()
  */
 command.prototype.getCommands = function()
 {
-    return this.commands;
+    return this.commands.slice(0);
+}
+
+/**
+ * Lookup a defined command.
+ *
+ * @param   string          name            Name of command.
+ * @return  Command|bool                     Returns the command instance or 'false' if no command was found.
+ */
+command.prototype.getCommand = function(name)
+{
+    var ret = false;
+
+    for (var i = 0, cnt = this.commands.length; i < cnt; ++i) {
+        if (this.commands[i].getName() === name) {
+            ret = this.commands[i];
+            break;
+        }
+    }
+
+    return ret;
 }
 
 /**
@@ -356,7 +377,7 @@ command.prototype.processOperands = function(args)
  */
 command.prototype.parse = function(argv)
 {
-    var arg, match, option;
+    var arg, match, option, command;
 
     var args = [];
     var options = {};
@@ -429,13 +450,13 @@ command.prototype.parse = function(argv)
         } else if (args.length < mm[1]) {
             // expected operand
             args.push(arg);
-        } else if (arg in this.commands) {
+        } else if ((command = this.getCommand(arg))) {
             // sub command
             operands = this.processOperands(args);
 
             this.settings.action.call(this, options, operands);
 
-            this.commands[arg].parse(argv);
+            command.parse(argv);
         } else {
             argv.unshift(arg);
             // console.log('too many arguments for "' + arg + '"');

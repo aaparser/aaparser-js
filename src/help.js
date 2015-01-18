@@ -73,13 +73,18 @@ help.prototype.printHelp = function(command)
     if (command.hasCommands()) {
         console.log('Commands:');
 
-        var names = Object.keys(command.getCommands()).sort();
-        var size = names.reduce(function(size, name) {
+        var commands = {};
+        var size = command.getCommands().reduce(function(size, cmd) {
+            var name = cmd.getName();
+
+            commands[name] = cmd;
+
             return Math.max(size, name.length);
         }, 0);
+        var names = Object.keys(commands).sort();
 
         names.forEach(function(name) {
-            console.log('    ' + name + str.repeat(' ', size - name.length) + '    ' + command.commands[name].getHelp());
+            console.log('    ' + name + str.repeat(' ', size - name.length) + '    ' + commands[name].getHelp());
         });
     }
 }
