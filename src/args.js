@@ -80,7 +80,7 @@ args.prototype.printVersion = function()
  */
 args.prototype.printHelp = function(command)
 {
-    require('./help.js')(this);
+    require('./help.js')(command);
 
     process.exit(1);
 }
