@@ -21,8 +21,17 @@ function help()
  */
 help.prototype.printHelp = function(command)
 {
+    var cmd = command;
+    var tree = []
+
+    do {
+        tree.unshift(cmd.name);
+
+        cmd = cmd.parent;
+    } while (cmd !== null);
+
     var usage = command.getUsage();
-    var buffer = 'usage: ' + command.name + ' ... ';
+    var buffer = ('usage: ' + tree.shift() + ' ' + tree.join(' [ARGUMENTS] ')).replace(/ +$/, '') + ' ';
     var len = buffer.length;
 
     for (var i = 0, cnt = usage.length; i < cnt; ++i) {
