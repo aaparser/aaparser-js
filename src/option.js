@@ -11,21 +11,16 @@ var extend = require('util')._extend;
  * Constructor.
  *
  * @param   string          name            Name of option.
- * @param   string          type            Type of option.
  * @param   array           flags           Option flags.
+ * @param   callable|bool   coercion        Either a coercion callback or a fixed value.
  * @param   object          settings        Optional additional settings.
  */
-function option(name, type, flags, settings)
+function option(name, flags, coercion, settings)
 {
-    if (['bool', 'count', 'list', 'value'].indexOf(type) < 0) {
-        throw 'invalid option type "' + type + '"';
-    }
-
     settings = extend(
         {
             'variable': name,
-            'default':  (type == 'bool' ? false : null),
-            'store':    (type == 'bool' ? true : null),
+            'default':  null,
             'help':     '',
             'required': false,
             'action':   function() {}
@@ -34,32 +29,11 @@ function option(name, type, flags, settings)
     );
 
     this.name = name;
-    this.type = type;
 
     this.data = null;
     this.flags = flags;
     this.settings = settings;
-
-    switch (this.type) {
-        case 'bool':
-            this.data = !!settings.default;
-            break;
-        case 'count':
-            this.data = (parseFloat(settings.default) == parseInt(settings.default) && !isNaN(settings.default)
-                            ? settings.default
-                            : 0);
-            break;
-        case 'list':
-            this.data = (Object.prototype.toString.call(settings.default) === '[object Array]'
-                            ? settings.default
-                            : null);
-            break;
-        case 'value':
-            this.data = (/boolean|number|string/.test(typeof settings.default)
-                            ? '' + settings.default
-                            : null);
-            break;
-    }
+    this.coercion = coercion;
 
     this.validators = [];
 }
@@ -181,7 +155,7 @@ option.prototype.isValid = function(value)
  */
 option.prototype.takesValue = function()
 {
-    return (['list', 'value'].indexOf(this.type) >= 0);
+    return (typeof this.coercion === 'function');
 }
 
 /**
@@ -191,36 +165,20 @@ option.prototype.takesValue = function()
  */
 option.prototype.getData = function()
 {
-    return (this.type == 'list' && this.data !== null
-            ? this.data.slice(0)
-            : this.data);
+    return this.data;
 }
 
 /**
- * Update option value(s) according to it's set 'type'. This should only be used to update the option
- * value(s) during option parsing.
+ * Update option value.
  *
  * @param   mixed           value           Optional value to set (ignored for 'type' == 'count' and 'type' == 'bool').
  */
 option.prototype.update = function(value)
 {
-    switch (this.type) {
-        case 'bool':
-            this.data = !!this.settings.store;
-            break;
-        case 'count':
-            this.data++;
-            break;
-        case 'list':
-            if (this.data === null) {
-                this.data = [value];
-            } else {
-                this.data.push(value);
-            }
-            break;
-        case 'value':
-            this.data = value;
-            break;
+    if (typeof this.coercion === 'function') {
+        this.coercion.call(this, value, this.data, this.settings.default);
+    } else {
+        this.data = this.coercion;
     }
 }
 
