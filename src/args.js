@@ -54,7 +54,7 @@ args.prototype.setVersion = function(str)
         // add implicit --version option
         var me = this;
 
-        command.prototype.addOption.call(this, 'version', 'bool', ['--version'], {
+        command.prototype.addOption.call(this, 'version', ['--version'], true, {
             'help': 'Print version info.'
         }).setAction(function() {
             me.printVersion();
