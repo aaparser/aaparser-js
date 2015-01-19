@@ -143,4 +143,7 @@ args.prototype.parse = function(argv)
 }
 
 // export
-module.exports = args;
+module.exports = {
+    parser: args,
+    coercion: require('./coercion.js')
+}
