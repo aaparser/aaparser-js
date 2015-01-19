@@ -11,7 +11,7 @@ var extend = require('util')._extend;
  * Constructor.
  *
  * @param   string          name            Name of option.
- * @param   array           flags           Option flags.
+ * @param   string          flags           Option flags.
  * @param   callable|bool   coercion        Either a coercion callback or a fixed value.
  * @param   object          settings        Optional additional settings.
  */
@@ -19,7 +19,7 @@ function option(name, flags, coercion, settings)
 {
     settings = extend(
         {
-            'variable': name,
+            'variable': null,
             'default':  null,
             'help':     '',
             'required': false,
@@ -29,13 +29,27 @@ function option(name, flags, coercion, settings)
     );
 
     this.name = name;
-
     this.data = null;
-    this.flags = flags;
-    this.settings = settings;
+    this.flags = [];
+    this.variable = null;
     this.coercion = coercion;
-
+    this.settings = settings;
     this.validators = [];
+
+    flags.split(/[, |]+/).forEach(function(part) {
+        var match;
+    
+        if (/^-[a-z0-9]$/.test(part)) {
+            this.flags.push(part);
+        } else if (/^--[a-z][a-z0-9-]+$/.test(part)) {
+            this.flags.push(part);
+        } else if ((match = part.match(/^<([^>]+)>$/))) {
+            this.variable = (settings.variable !== null ? settings.variable : match[1]);
+        } else {
+            throw 'unexpected string "' + part + '"';
+        }
+    }, this);
+
 }
 
 /**
@@ -75,7 +89,7 @@ option.prototype.getFlags = function()
  */
 option.prototype.getVariable = function()
 {
-    return this.settings.variable;
+    return this.variable;
 }
 
 /**
@@ -155,7 +169,7 @@ option.prototype.isValid = function(value)
  */
 option.prototype.takesValue = function()
 {
-    return (typeof this.coercion === 'function');
+    return (typeof this.variable !== null);
 }
 
 /**
