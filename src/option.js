@@ -39,9 +39,9 @@ function option(name, flags, coercion, settings)
     flags.split(/[, |]+/).forEach(function(part) {
         var match;
     
-        if (/^-[a-z0-9]$/.test(part)) {
+        if (/^-[a-z0-9]$/i.test(part)) {
             this.flags.push(part);
-        } else if (/^--[a-z][a-z0-9-]+$/.test(part)) {
+        } else if (/^--[a-z][a-z0-9-]+$/i.test(part)) {
             this.flags.push(part);
         } else if ((match = part.match(/^<([^>]+)>$/))) {
             this.variable = (settings.variable !== null ? settings.variable : match[1]);
