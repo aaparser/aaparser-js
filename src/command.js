@@ -113,7 +113,7 @@ command.prototype.addCommand = function(name, settings)
  * Create a new option for command.
  *
  * @param   string          name            Internal name of option.
- * @param   array           flags           Option flags.
+ * @param   string          flags           Option flags.
  * @param   callable|bool   coercion        Either a coercion callback or a fixed value.
  * @param   object          options         Optional additional settings.
  * @return  Option                          Instance of created option.
