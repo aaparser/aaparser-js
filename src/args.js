@@ -18,19 +18,23 @@ function args(name, settings)
 {
     settings = extend(
         {
-            'version':        null,
-            'version_string': '{version}'
+            'name':           name,
+            'version':        '0.0.0',
+            'version_string': '${name} ${version}'
         },
         settings
     );
 
     command.call(this, name, null, settings);
 
-    this.version = null;
-
-    if (this.settings.version !== null) {
-        this.setVersion(this.settings.verion);
-    }
+    // add implicit --version option
+    var me = this;
+    
+    command.prototype.addOption.call(this, 'version', '--version', true, {
+        'help': 'Print version info.'
+    }).setAction(function() {
+        me.printVersion();
+    });
 }
 
 /**
@@ -42,24 +46,12 @@ args.prototype.constructor = args;
 /**
  * Setter for the application version.
  *
- * @param   string          str         Version string.
- * @param   string
+ * @param   string          str         Version number.
  * @return  app                         Returns class instance.
  */
 args.prototype.setVersion = function(str)
 {
-    if (this.version === null) {
-        this.version = str;
-
-        // add implicit --version option
-        var me = this;
-
-        command.prototype.addOption.call(this, 'version', '--version', true, {
-            'help': 'Print version info.'
-        }).setAction(function() {
-            me.printVersion();
-        });
-    }
+    this.settings.version = str;
 
     return this;
 }
@@ -69,7 +61,18 @@ args.prototype.setVersion = function(str)
  */
 args.prototype.printVersion = function()
 {
-    console.log(this.version);
+    var me = this;
+    
+    console.log(this.settings.version_string.replace(/\$\{([^}]+)\}/g, function(_, m1) {
+        var ret = '${' + m1 + '}';
+        
+        if (m1 in me.settings) {
+            ret = me.settings[m1];
+        }
+        
+        return ret;
+    }));
+    
     process.exit(1);
 }
 
