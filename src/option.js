@@ -169,7 +169,7 @@ option.prototype.isValid = function(value)
  */
 option.prototype.takesValue = function()
 {
-    return (typeof this.variable !== null);
+    return (this.variable !== null);
 }
 
 /**
