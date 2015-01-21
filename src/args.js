@@ -43,6 +43,9 @@ function args(name, settings)
 args.prototype = Object.create(command.prototype);
 args.prototype.constructor = args;
 
+// export coercion
+args.coercion = require('./coercion.js');
+
 /**
  * Setter for the application version.
  *
@@ -146,7 +149,4 @@ args.prototype.parse = function(argv)
 }
 
 // export
-module.exports = {
-    parser: args,
-    coercion: require('./coercion.js')
-}
+module.exports = args; 
