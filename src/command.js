@@ -432,10 +432,9 @@ command.prototype.parse = function(argv)
             // sub command
             break;
         } else {
+            // no further arguments should be parsed
             argv.unshift(arg);
-            // console.log('too many arguments for "' + arg + '"');
-            // process.exit(1);
-            break;  // no further arguments should be parsed
+            break;  
         }
     }
 
