@@ -141,11 +141,20 @@ args.prototype.addCommand = function(name, settings)
  */
 args.prototype.parse = function(argv)
 {
+    var arg, args;
+    
     if (typeof argv == 'undefined') {
-        argv = process.argv.slice(2);
+        args = process.argv.slice(2);
+    } else {
+        args = argv.slice(0);
     }
 
-    command.prototype.parse.call(this, argv.slice(0));
+    command.prototype.parse.call(this, args);
+    
+    if ((arg = args.shift())) {
+        console.log('too many arguments for "' + arg + '"');
+        process.exit(1);
+    }
 }
 
 // export

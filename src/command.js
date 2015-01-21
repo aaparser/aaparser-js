@@ -354,12 +354,13 @@ command.prototype.processOperands = function(args)
  */
 command.prototype.parse = function(argv)
 {
-    var arg, match, option, command;
+    var arg, match, option;
 
     var args = [];
     var options = {};
     var operands = {};
     var literal = false;
+    var subcommand = null;
 
     this.options.forEach(function(option) {
         var data = option.getData();
@@ -427,13 +428,9 @@ command.prototype.parse = function(argv)
         } else if (args.length < mm[1]) {
             // expected operand
             args.push(arg);
-        } else if ((command = this.getCommand(arg))) {
+        } else if ((subcommand = this.getCommand(arg))) {
             // sub command
-            operands = this.processOperands(args);
-
-            this.settings.action.call(this, options, operands);
-
-            command.parse(argv);
+            break;
         } else {
             argv.unshift(arg);
             // console.log('too many arguments for "' + arg + '"');
@@ -442,9 +439,37 @@ command.prototype.parse = function(argv)
         }
     }
 
+    // check if all required options are available
+    this.options.forEach(function(option) {
+        if (option.isRequired() && !(option.getName() in options)) {
+            console.log('required argument is missing "' + option.getFlags().join(' | ') + '"');
+            process.exit(1);
+        } 
+    });
+
+    // parse operands
     operands = this.processOperands(args);
 
+    // action callback for operator
     this.settings.action.call(this, options, operands);
+
+    // there's a subcommand to be called
+    if (subcommand !== null) {
+        do {
+            subcommand.parse(argv);
+            
+            if ((arg = argv.shift())) {
+                if (!(subcommand = this.getCommand(arg))) {
+                    // argument does not belong to a subcommand registered at this level
+                    argv.unshift(arg);
+                    break;
+                }
+            } else {
+                // no more arguments
+                break
+            }
+        } while(true);
+    }
 }
 
 // export
