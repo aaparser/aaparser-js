@@ -1,21 +1,29 @@
 {
-    "name": "aaparser",
-    "version": "0.0.1",
-    "description": "another argument parser for node.js",
-    "keywords": [
-        "command", "cli", "option", "argument", "parser"
-    ],
-    "author": "Harald Lapp <harald@octris.org>",
-    "license": "BSD-3-Clause",
-
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/aurora/aaparser.git"
-    },
-
-    "engines": {
-        "node": ">= 0.6.x"
-    },
-
-    "main": "src/args.js"
+  "name": "aaparser",
+  "version": "0.0.1",
+  "description": "another argument parser for node.js",
+  "keywords": [
+    "command",
+    "cli",
+    "option",
+    "argument",
+    "parser"
+  ],
+  "author": "Harald Lapp <harald@octris.org>",
+  "license": "BSD-3-Clause",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aurora/aaparser.git"
+  },
+  "engines": {
+    "node": ">= 0.6.x"
+  },
+  "main": "src/args.js",
+  "bugs": {
+    "url": "https://github.com/aurora/aaparser/issues"
+  },
+  "homepage": "https://github.com/aurora/aaparser",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
 }
