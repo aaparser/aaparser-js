@@ -1,5 +1,5 @@
 /**
- * Help system for octoarg.
+ * Help system for aaparser.
  *
  * @copyright   copyright (c) 2015 by Harald Lapp
  * @author      Harald Lapp <harald@octris.org>
