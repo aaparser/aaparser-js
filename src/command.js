@@ -115,12 +115,12 @@ command.prototype.addCommand = function(name, settings)
  * @param   string          name            Internal name of option.
  * @param   string          flags           Option flags.
  * @param   callable|bool   coercion        Either a coercion callback or a fixed value.
- * @param   object          options         Optional additional settings.
+ * @param   object          settings        Optional additional settings.
  * @return  Option                          Instance of created option.
  */
-command.prototype.addOption = function(name, flags, coercion, options)
+command.prototype.addOption = function(name, flags, coercion, settings)
 {
-    var ret = new option(name, flags, coercion, options);
+    var ret = new option(name, flags, coercion, settings);
 
     this.options.push(ret);
 
@@ -132,12 +132,12 @@ command.prototype.addOption = function(name, flags, coercion, options)
  *
  * @param   string          name            Internal name of operand.
  * @param   int|string      num             Number of arguments.
- * @param   object          options         Optional additional settings.
+ * @param   object          settings        Optional additional settings.
  * @return  Operand                         Instance of created operand.
  */
-command.prototype.addOperand = function(name, num, options)
+command.prototype.addOperand = function(name, num, settings)
 {
-    var ret = new operand(name, num, options);
+    var ret = new operand(name, num, settings);
 
     this.operands.push(ret);
 
