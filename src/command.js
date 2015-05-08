@@ -450,7 +450,7 @@ command.prototype.parse = function(argv)
     // parse operands
     operands = this.processOperands(args);
 
-    // action callback for operator
+    // action callback for command
     this.settings.action.call(this, options, operands);
 
     // there's a subcommand to be called
