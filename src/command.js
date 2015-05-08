@@ -384,7 +384,7 @@ command.prototype.parse = function(argv)
             continue;
         }
 
-        if ((match = arg.match(/^(-[a-z0-9])([a-z0-9]*)()$/)) ||
+        if ((match = arg.match(/^(-[a-z0-9])([a-z0-9]*)()$/i)) ||
             (match = arg.match(/^(--[a-z][a-z0-9-]*)()(=.*|)$/i))) {
             // option argument
 
