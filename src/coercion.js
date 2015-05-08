@@ -49,7 +49,7 @@ module.exports = {
     /**
      * Split a value by ','.
      */
-    list: function(value) {
+    listing: function(value) {
         return value.split(/ *, */);
     },
 
