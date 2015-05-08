@@ -12,7 +12,7 @@ var extend = require('util')._extend;
  *
  * @param   string          name            Name of option.
  * @param   string          flags           Option flags.
- * @param   callable|bool   coercion        Either a coercion callback or a fixed value.
+ * @param   callable|mixed  coercion        Either a coercion callback or a fixed value.
  * @param   object          settings        Optional additional settings.
  */
 function option(name, flags, coercion, settings)
