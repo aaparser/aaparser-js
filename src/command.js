@@ -275,6 +275,7 @@ command.prototype.getMinMaxOperands = function()
  * Get remaining minimum number of operands expected.
  *
  * @param   int             n               Number of operand to begin with to calculate remaining minimum expected operands.
+ * @return  int                             Expected minimum remaining operands.
  */
 command.prototype.getMinRemaining = function(n)
 {
