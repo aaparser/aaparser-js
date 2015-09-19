@@ -115,12 +115,12 @@ command.prototype.addCommand = function(name, settings)
  * @param   string          name            Internal name of option.
  * @param   string          flags           Option flags.
  * @param   callable|bool   coercion        Either a coercion callback or a fixed value.
- * @param   object          options         Optional additional settings.
+ * @param   object          settings        Optional additional settings.
  * @return  Option                          Instance of created option.
  */
-command.prototype.addOption = function(name, flags, coercion, options)
+command.prototype.addOption = function(name, flags, coercion, settings)
 {
-    var ret = new option(name, flags, coercion, options);
+    var ret = new option(name, flags, coercion, settings);
 
     this.options.push(ret);
 
@@ -132,12 +132,12 @@ command.prototype.addOption = function(name, flags, coercion, options)
  *
  * @param   string          name            Internal name of operand.
  * @param   int|string      num             Number of arguments.
- * @param   object          options         Optional additional settings.
+ * @param   object          settings        Optional additional settings.
  * @return  Operand                         Instance of created operand.
  */
-command.prototype.addOperand = function(name, num, options)
+command.prototype.addOperand = function(name, num, settings)
 {
-    var ret = new operand(name, num, options);
+    var ret = new operand(name, num, settings);
 
     this.operands.push(ret);
 
@@ -275,6 +275,7 @@ command.prototype.getMinMaxOperands = function()
  * Get remaining minimum number of operands expected.
  *
  * @param   int             n               Number of operand to begin with to calculate remaining minimum expected operands.
+ * @return  int                             Expected minimum remaining operands.
  */
 command.prototype.getMinRemaining = function(n)
 {
@@ -384,7 +385,7 @@ command.prototype.parse = function(argv)
             continue;
         }
 
-        if ((match = arg.match(/^(-[a-z0-9])([a-z0-9]*)()$/)) ||
+        if ((match = arg.match(/^(-[a-z0-9])([a-z0-9]*)()$/i)) ||
             (match = arg.match(/^(--[a-z][a-z0-9-]*)()(=.*|)$/i))) {
             // option argument
 
@@ -449,7 +450,7 @@ command.prototype.parse = function(argv)
     // parse operands
     operands = this.processOperands(args);
 
-    // action callback for operator
+    // action callback for command
     this.settings.action.call(this, options, operands);
 
     // there's a subcommand to be called

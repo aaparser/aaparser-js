@@ -41,7 +41,7 @@ module.exports = {
         
         var kv = value.split('=');
 
-        collection[k[0]] = v[0];
+        collection[kv[0]] = kv[1];
 
         return collection;
     },
@@ -49,7 +49,7 @@ module.exports = {
     /**
      * Split a value by ','.
      */
-    list: function(value) {
+    listing: function(value) {
         return value.split(/ *, */);
     },
 
