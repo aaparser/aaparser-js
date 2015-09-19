@@ -29,7 +29,7 @@ function args(name, settings)
 
     // add implicit --version option
     var me = this;
-    
+
     command.prototype.addOption.call(this, 'version', '--version', true, {
         'help': 'Print version info.'
     }).setAction(function() {
@@ -60,22 +60,32 @@ args.prototype.setVersion = function(str)
 }
 
 /**
+ * Getter for application version.
+ *
+ * @return  string                      Version number.
+ */
+args.prototype.getVersion = function()
+{
+    return this.settings.version;
+}
+
+/**
  * Print versin.
  */
 args.prototype.printVersion = function()
 {
     var me = this;
-    
+
     console.log(this.settings.version_string.replace(/\$\{([^}]+)\}/g, function(_, m1) {
         var ret = '${' + m1 + '}';
-        
+
         if (m1 in me.settings) {
             ret = me.settings[m1];
         }
-        
+
         return ret;
     }));
-    
+
     process.exit(1);
 }
 
@@ -142,7 +152,7 @@ args.prototype.addCommand = function(name, settings)
 args.prototype.parse = function(argv)
 {
     var arg, args;
-    
+
     if (typeof argv == 'undefined') {
         args = process.argv.slice(2);
     } else {
@@ -150,7 +160,7 @@ args.prototype.parse = function(argv)
     }
 
     command.prototype.parse.call(this, args);
-    
+
     if ((arg = args.shift())) {
         console.log('too many arguments for "' + arg + '"');
         process.exit(1);
@@ -158,4 +168,4 @@ args.prototype.parse = function(argv)
 }
 
 // export
-module.exports = args; 
+module.exports = args;
