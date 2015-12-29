@@ -35,6 +35,11 @@ function args(name, settings)
     }).setAction(function() {
         me.printVersion();
     });
+    command.prototype.addOption.call(this, 'help', '-h | --help', true, {
+        'help': 'Print help information.'
+    }).setAction(function() {
+        me.printHelp();
+    });
 }
 
 /**
