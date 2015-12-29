@@ -162,7 +162,7 @@ args.prototype.parse = function(argv)
     command.prototype.parse.call(this, args);
 
     if ((arg = args.shift())) {
-        console.log('too many arguments for "' + arg + '"');
+        console.log('too many arguments at "' + arg + '"');
         process.exit(1);
     }
 }
