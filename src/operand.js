@@ -27,7 +27,7 @@ function operand(name, num, settings)
     );
 
     if (parseFloat(num) == parseInt(num) && !isNaN(num) && num > 0) {
-        this.num = num;
+        this.num = parseInt(num);
     } else if (num === '?' || num === '*' || num === '+') {
         this.num = num;
     } else {
