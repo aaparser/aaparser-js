@@ -155,6 +155,17 @@ command.prototype.hasCommands = function()
 }
 
 /**
+ * Test if command with specified name exists.
+ *
+ * @param   string          name           Name of command.
+ * @return  bool                           Returns true, if specified command exists.
+ */
+command.prototype.hasCommand = function(name)
+{
+    return !!this.getCommand(name);
+}
+
+/**
  * Return all defined subcommands.
  *
  * @return  array                           Commands.
