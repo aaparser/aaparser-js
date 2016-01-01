@@ -101,10 +101,9 @@ args.prototype.printVersion = function()
  */
 args.prototype.printHelp = function(command)
 {
-    var instance =
-        (typeof command === 'undefined' || !this.hasCommand(command)
-            ? this
-            : this.getCommand(command));
+    var instance = (typeof command === 'undefined'
+                    ? this
+                    : command);
 
     require('./help.js')(instance);
 
