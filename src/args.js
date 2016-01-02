@@ -136,7 +136,7 @@ args.prototype.addCommand = function(name, settings)
         var me = this;
 
         var cmd = command.prototype.addCommand.call(this, 'help', {
-            'help':   'Help',
+            'help':   'Display help for a subcommand.',
             'action': function(options, operands) {
                 var command = me;
 
