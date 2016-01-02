@@ -20,7 +20,8 @@ function args(name, settings)
         {
             'name':           name,
             'version':        '0.0.0',
-            'version_string': '${name} ${version}'
+            'version_string': '${name} ${version}',
+            'default_action': function() {}
         },
         settings
     );
@@ -111,6 +112,17 @@ args.prototype.printHelp = function(command)
 }
 
 /**
+ * Set default action that is called, when no command line arguments are privided and no
+ * error occured after argument processing.
+ *
+ * @param   callable        fn              Function to call.
+ */
+args.prototype.setDefaultAction = function(fn)
+{
+    this.settings.default_action = fn;
+}
+
+/**
  * Define a new command.
  *
  * @param   string          name            Name of command.
@@ -168,7 +180,13 @@ args.prototype.parse = function(argv)
         args = argv.slice(0);
     }
 
+    var cnt = args.length;
+
     command.prototype.parse.call(this, args);
+
+    if (cnt == 0) {
+        this.settings.default_action();
+    }
 
     if ((arg = args.shift())) {
         console.log('too many arguments at "' + arg + '"');
