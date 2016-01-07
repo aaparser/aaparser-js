@@ -451,7 +451,9 @@ command.prototype.parse = function(argv)
     operands = this.processOperands(args);
 
     // action callback for command
-    this.settings.action.call(this, options, operands);
+    if (action in this.settings) {
+        this.settings.action.call(this, options, operands);
+    }
 
     // there's a subcommand to be called
     if (subcommand !== null) {
