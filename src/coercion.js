@@ -11,10 +11,10 @@ module.exports = {
      */
     collect: function(value, collection)
     {
-        if (Object.prototype.toString.call(settings.default) !== '[object Array]') {
+        if (Object.prototype.toString.call(collection) !== '[object Array]') {
             collection = [];
         }
-        
+
         collection.push(value);
 
         return collection;
@@ -27,7 +27,7 @@ module.exports = {
         if (isNaN(total)) {
             total = 0;
         }
-        
+
         return total += value;
     },
 
@@ -35,13 +35,13 @@ module.exports = {
      * Build a key/value with values provided.
      */
     kv: function(value, collection) {
-        if (Object.prototype.toString.call(settings.default) !== '[object Array]') {
+        if (Object.prototype.toString.call(collection) !== '[object Array]') {
             collection = {};
         }
-        
+
         var kv = value.split('=');
 
-        collection[kv[0]] = kv[1];
+        collection[kv[0]] = (typeof kv[1] !== 'undefined' ? kv[1] : null);
 
         return collection;
     },
