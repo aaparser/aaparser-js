@@ -47,10 +47,13 @@ command.prototype.constructor = command;
  * Set help text.
  *
  * @param   string          str             Help text.
+ * @return  object                          Instance for method chaining.
  */
 command.prototype.setHelp = function(str)
 {
     this.settings.help = str;
+    
+    return this;
 }
 
 /**
@@ -87,10 +90,13 @@ command.prototype.getParent = function()
  * Set action to call if command appears in arguments.
  *
  * @param   callable        fn              Function to call.
+ * @return  object                          Instance for method chaining.
  */
 command.prototype.setAction = function(fn)
 {
     this.settings.action = fn;
+    
+    return $this;
 }
 
 /**

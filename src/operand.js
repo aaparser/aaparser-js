@@ -46,10 +46,13 @@ function operand(name, num, settings)
  * Set help text.
  *
  * @param   string          str             Help text.
+ * @return  object                          Instance for method chaining.
  */
 operand.prototype.setHelp = function(str)
 {
     this.settings.help = str;
+    
+    return this;
 }
 
 /**
@@ -108,10 +111,13 @@ operand.prototype.getExpected = function()
  * Add a value validator. This has only effect for options that require a value.
  *
  * @param   callable        fn              Validation callback.
+ * @return  object                          Instance for method chaining.
  */
 operand.prototype.addValidator = function(fn)
 {
     this.validators.push(fn);
+    
+    return this;
 }
 
 /**

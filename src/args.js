@@ -116,10 +116,13 @@ args.prototype.printHelp = function(command)
  * error occured after argument processing.
  *
  * @param   callable        fn              Function to call.
+ * @return  object                          Instance for method chaining.
  */
 args.prototype.setDefaultAction = function(fn)
 {
     this.settings.default_action = fn;
+    
+    return this;
 }
 
 /**

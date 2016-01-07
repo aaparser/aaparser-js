@@ -56,10 +56,13 @@ function option(name, flags, coercion, settings)
  * Set help text.
  *
  * @param   string          str             Help text.
+ * @return  object                          Instance for method chaining.
  */
 option.prototype.setHelp = function(str)
 {
     this.settings.help = str;
+    
+    return this;
 }
 
 /**
@@ -106,20 +109,26 @@ option.prototype.getName = function()
  * Set action to call if option appears in arguments.
  *
  * @param   callable        fn              Function to call.
+ * @return  object                          Instance for method chaining.
  */
 option.prototype.setAction = function(fn)
 {
     this.settings.action = fn;
+    
+    return this;
 }
 
 /**
  * Add a value validator. This has only effect for options that require a value.
  *
  * @param   callable        fn              Validation callback.
+ * @return  object                          Instance for method chaining.
  */
 option.prototype.addValidator = function(fn)
 {
     this.validators.push(fn);
+    
+    return this;
 }
 
 /**
