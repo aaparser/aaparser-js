@@ -20,7 +20,8 @@ function args(name, settings)
         {
             'name':           name,
             'version':        '0.0.0',
-            'version_string': '${name} ${version}'
+            'version_string': '${name} ${version}',
+            'default_action': function() {}
         },
         settings
     );
@@ -29,11 +30,16 @@ function args(name, settings)
 
     // add implicit --version option
     var me = this;
-    
+
     command.prototype.addOption.call(this, 'version', '--version', true, {
         'help': 'Print version info.'
     }).setAction(function() {
         me.printVersion();
+    });
+    command.prototype.addOption.call(this, 'help', '-h | --help', true, {
+        'help': 'Print help information.'
+    }).setAction(function() {
+        me.printHelp();
     });
 }
 
@@ -60,22 +66,32 @@ args.prototype.setVersion = function(str)
 }
 
 /**
+ * Getter for application version.
+ *
+ * @return  string                      Version number.
+ */
+args.prototype.getVersion = function()
+{
+    return this.settings.version;
+}
+
+/**
  * Print versin.
  */
 args.prototype.printVersion = function()
 {
     var me = this;
-    
+
     console.log(this.settings.version_string.replace(/\$\{([^}]+)\}/g, function(_, m1) {
         var ret = '${' + m1 + '}';
-        
+
         if (m1 in me.settings) {
             ret = me.settings[m1];
         }
-        
+
         return ret;
     }));
-    
+
     process.exit(1);
 }
 
@@ -86,9 +102,24 @@ args.prototype.printVersion = function()
  */
 args.prototype.printHelp = function(command)
 {
-    require('./help.js')(command);
+    var instance = (typeof command === 'undefined'
+                    ? this
+                    : command);
+
+    require('./help.js')(instance);
 
     process.exit(1);
+}
+
+/**
+ * Set default action that is called, when no command line arguments are privided and no
+ * error occured after argument processing.
+ *
+ * @param   callable        fn              Function to call.
+ */
+args.prototype.setDefaultAction = function(fn)
+{
+    this.settings.default_action = fn;
 }
 
 /**
@@ -105,7 +136,7 @@ args.prototype.addCommand = function(name, settings)
         var me = this;
 
         var cmd = command.prototype.addCommand.call(this, 'help', {
-            'help':   'Help',
+            'help':   'Display help for a subcommand.',
             'action': function(options, operands) {
                 var command = me;
 
@@ -142,20 +173,26 @@ args.prototype.addCommand = function(name, settings)
 args.prototype.parse = function(argv)
 {
     var arg, args;
-    
+
     if (typeof argv == 'undefined') {
         args = process.argv.slice(2);
     } else {
         args = argv.slice(0);
     }
 
+    var cnt = args.length;
+
     command.prototype.parse.call(this, args);
-    
+
+    if (cnt == 0) {
+        this.settings.default_action();
+    }
+
     if ((arg = args.shift())) {
-        console.log('too many arguments for "' + arg + '"');
+        console.log('too many arguments at "' + arg + '"');
         process.exit(1);
     }
 }
 
 // export
-module.exports = args; 
+module.exports = args;

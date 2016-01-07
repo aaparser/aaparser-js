@@ -155,6 +155,17 @@ command.prototype.hasCommands = function()
 }
 
 /**
+ * Test if command with specified name exists.
+ *
+ * @param   string          name           Name of command.
+ * @return  bool                           Returns true, if specified command exists.
+ */
+command.prototype.hasCommand = function(name)
+{
+    return !!this.getCommand(name);
+}
+
+/**
  * Return all defined subcommands.
  *
  * @return  array                           Commands.
@@ -361,7 +372,7 @@ command.prototype.parse = function(argv)
     var options = {};
     var operands = {};
     var literal = false;
-    var subcommand = null;
+    var subcommand = false;
 
     this.options.forEach(function(option) {
         var data = option.getData();
@@ -435,7 +446,7 @@ command.prototype.parse = function(argv)
         } else {
             // no further arguments should be parsed
             argv.unshift(arg);
-            break;  
+            break;
         }
     }
 
@@ -444,7 +455,7 @@ command.prototype.parse = function(argv)
         if (option.isRequired() && !(option.getName() in options)) {
             console.log('required argument is missing "' + option.getFlags().join(' | ') + '"');
             process.exit(1);
-        } 
+        }
     });
 
     // parse operands
@@ -456,10 +467,10 @@ command.prototype.parse = function(argv)
     }
 
     // there's a subcommand to be called
-    if (subcommand !== null) {
+    if (subcommand) {
         do {
             subcommand.parse(argv);
-            
+
             if ((arg = argv.shift())) {
                 if (!(subcommand = this.getCommand(arg))) {
                     // argument does not belong to a subcommand registered at this level
