@@ -32,9 +32,12 @@ function option(name, flags, coercion, settings)
     this.data = null;
     this.flags = [];
     this.variable = null;
-    this.coercion = coercion;
     this.settings = settings;
     this.validators = [];
+
+    this.coercion = (typeof coercion === 'function'
+                        ? coercion
+                        : function(_, _) { return coercion; });
 
     flags.split(/[, |]+/).forEach(function(part) {
         var match;
@@ -197,17 +200,24 @@ option.prototype.getData = function()
 }
 
 /**
+ * Coerce value according to configured coercion function.
+ *
+ * @param   mixed           value           Value to coerce according to defined coercion type.
+ * @return  mixed                           Coerced value.
+ */
+option.prototype.coerce = function(value)
+{
+    return this.coercion(value, this.settings.default);
+}
+
+/**
  * Update option value.
  *
- * @param   mixed           value           Optional value to set (ignored for 'type' == 'count' and 'type' == 'bool').
+ * @param   mixed           value           Optional value to set. The resulting value depends on the coercion type defined.
  */
 option.prototype.update = function(value)
 {
-    if (typeof this.coercion === 'function') {
-        this.data = this.coercion.call(this, value, this.data, this.settings.default);
-    } else {
-        this.data = this.coercion;
-    }
+    this.data = this.coercion(value, (this.data === null ? this.settings.default : this.data));
 }
 
 // export
