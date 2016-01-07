@@ -51,7 +51,7 @@ function operand(name, num, settings)
 operand.prototype.setHelp = function(str)
 {
     this.settings.help = str;
-    
+
     return this;
 }
 
@@ -111,12 +111,16 @@ operand.prototype.getExpected = function()
  * Add a value validator. This has only effect for options that require a value.
  *
  * @param   callable        fn              Validation callback.
+ * @param   string          errstr          Optional error string to print if validation fails.
  * @return  object                          Instance for method chaining.
  */
-operand.prototype.addValidator = function(fn)
+operand.prototype.addValidator = function(fn, errstr)
 {
-    this.validators.push(fn);
-    
+    this.validators.push({
+        fn: fn,
+        errstr: errstr || ''
+    });
+
     return this;
 }
 

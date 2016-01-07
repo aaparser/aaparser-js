@@ -52,7 +52,7 @@ command.prototype.constructor = command;
 command.prototype.setHelp = function(str)
 {
     this.settings.help = str;
-    
+
     return this;
 }
 
@@ -95,7 +95,7 @@ command.prototype.getParent = function()
 command.prototype.setAction = function(fn)
 {
     this.settings.action = fn;
-    
+
     return $this;
 }
 
@@ -319,6 +319,7 @@ command.prototype.processOperands = function(args)
     var ret = {};
     var op = 0;
     var minmax = this.getMinMaxOperands();
+    var result;
 
     if (minmax[0] > args.length) {
         console.log('not enough arguments -- available ' + args.length + ', expected ' + minmax[0]);
@@ -349,8 +350,15 @@ command.prototype.processOperands = function(args)
             // expected operand
             arg = args.shift();
 
-            if (!operand.isValid(arg)) {
+            result = operand.isValid(arg);
+
+            if (!result[0]) {
                 console.log('invalid value "' + arg + '" for operand');
+
+                if (result[1]) {
+                    console.log(result[1].replace(/\$\{value\}/g, arg));
+                }
+
                 process.exit(1);
             }
 
@@ -379,6 +387,7 @@ command.prototype.parse = function(argv)
     var operands = {};
     var literal = false;
     var subcommand = false;
+    var result;
 
     this.options.forEach(function(option) {
         var data = option.getData();
@@ -420,8 +429,15 @@ command.prototype.parse = function(argv)
             if (option.takesValue()) {
                 if ((arg = argv.shift())) {
                     // value required
-                    if (!option.isValid(arg)) {
+                    result = option.isValid(arg);
+
+                    if (!result[0]) {
                         console.log('invalid value for argument "' + match[1] + '"')
+
+                        if (result[1]) {
+                            console.log(result[1].replace(/\$\{value\}/g, arg));
+                        }
+
                         process.exit(1);
                     } else {
                         option.update(arg);
