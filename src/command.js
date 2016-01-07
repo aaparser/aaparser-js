@@ -429,7 +429,7 @@ command.prototype.parse = function(argv)
             if (option.takesValue()) {
                 if ((arg = argv.shift())) {
                     // value required
-                    result = option.isValid(arg);
+                    result = option.isValid(option.coerce(arg));
 
                     if (!result[0]) {
                         console.log('invalid value for argument "' + match[1] + '"')
