@@ -86,6 +86,12 @@ function printHelp(command)
     var cmd = command;
     var tree = []
 
+    var description = command.getHelp();
+    
+    if (description !== '') {
+        console.log('Command: ' + str.wordwrap(command.getName() + ' -- ' + description, 10, 78) + '\n\n');
+    }
+
     do {
         tree.unshift(cmd.getName());
 
