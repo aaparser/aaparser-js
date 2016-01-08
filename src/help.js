@@ -93,7 +93,7 @@ function printHelp(command)
     } while (cmd !== null);
 
     var usage = getUsage(command);
-    var buffer = ('usage: ' + tree.shift() + ' ' + tree.join(' [ARGUMENTS] ')).replace(/ +$/, '') + ' ';
+    var buffer = ('Usage: ' + tree.shift() + ' ' + tree.join(' [ARGUMENTS] ')).replace(/ +$/, '') + ' ';
     var len = buffer.length;
 
     for (var i = 0, cnt = usage.length; i < cnt; ++i) {
