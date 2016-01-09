@@ -31,7 +31,7 @@ function operand(name, num, settings)
     } else if (num === '?' || num === '*' || num === '+') {
         this.num = num;
     } else {
-        throw 'either an integer > 0 or one of the characters \'?\', \'*\' or \'+\' are required as first parameter. Input was: ' + num;
+        throw 'either an integer > 0 or one of the characters \'?\', \'*\' or \'+\' are required as second parameter. Input was: ' + num;
     }
 
     this.name = name;
